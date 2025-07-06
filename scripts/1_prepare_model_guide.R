@@ -16,7 +16,7 @@ library("groundhog")
 groundhog.day <- "2025-04-15"
 libs <- c("metafor", "broom", "data.table",
           "ggplot2", "tidyr", "multcomp",
-          "dplyr", 
+          "dplyr","glmmTMB",
           "cpp11", "withr", "colorspace", "mvtnorm",
           "foreach", "doSNOW")
 groundhog.library(libs, groundhog.day)
@@ -29,6 +29,7 @@ guide <- CJ(response = c("persistence", "play", "stupidity", "happy", "hoho"),
                     "brightness", "loveliness"),
             location_or_scale = c("location", "location_scale"))
 
+#' [How to write this in dplyr:]
 # guide <- expand.grid(response = c("persistence", "play", "stupidity", "happy", "hoho"),
 #                      var = c("urbanization", "temperature", "darkness", 
 #                              "brightness", "loveliness",
@@ -40,6 +41,7 @@ guide <- CJ(response = c("persistence", "play", "stupidity", "happy", "hoho"),
 
 guide[, null_model_formula := paste(response, "~ 1 + (1|site_id)")]
 
+#' [How to write in dplyr:]
 # guide <- guide %>%
 #   mutate(null_model = paste(response, "~ 1 + (1|site_id"))
 
@@ -57,9 +59,6 @@ guide[var == "urbanization", urbanization_formula := NA]
 
 guide[, extent := "city_and_park"]
 
-#' [NEED TO SPECIFY MODEL FAMILY] -----------------------------------------
-#' [Need to add dispformula. but don't need dispformula for null models or potentially for univariate]
-#' 
 # >>> Create within urban model guide -----------------------------------------
 
 city_guide <- copy(guide)
@@ -78,6 +77,23 @@ guide <- rbind(guide,
                city_guide)
 
 guide
+
+# >>> Specify model family -----------------------------------------
+unique(guide$response)
+
+guide[response == "happy", model_family := "gaussian()"]
+guide[response == "hoho", model_family := "binomial(link = 'logit')"]
+guide[response == "persistence", model_family := "poisson()"]
+guide[response == "play", model_family := "nbinom1(link = 'log')"]
+guide[response == "stupidity", model_family := "nbinom2(link = 'log')"]
+
+
+# >>> Specify zero-inflation models -----------------------------------------
+#' [This should be based on preliminary data exploration]
+guide[, zero_inflation := ifelse(response %in% c("persistence", "play"),
+                                 "yes", "no")]
+guide
+
 
 # >>> Add model comparison IDs --------------------------------------------
 
@@ -121,6 +137,7 @@ guide.long
 guide.long <- guide.long[!is.na(formula), ]
 guide.long
 
+guide.long[, model_type := gsub("_formula", "", model_type)]
 
 # >>> Test that formulas are correctly formed -----------------------------
 
@@ -138,6 +155,27 @@ guide.long[, model_path := paste0("outputs/models/", model_id, ".Rds")]
 guide.long
 
 
+# >>> Drop unneeded location-scale models ---------------------------------
+
+unique(guide.long[!(location_or_scale == "location_scale" & model_type == "null_model"), .(model_type, location_or_scale)])
+
+guide.long <- guide.long[!(location_or_scale == "location_scale" & model_type == "null_model"), ]
+
+# >>> Add dispformula -----------------------------------------------------
+
+guide.long[location_or_scale == "location_scale",]
+guide.long[location_or_scale == "location_scale", 
+           dispformula := paste("~", var)]
+guide.long[location_or_scale == "location_scale" & model_type == "urbanization", 
+           dispformula := paste(dispformula, "+", ifelse(extent == "city_and_park",
+                                                         "urbanization", "urbanization_score"))]
+
+
+guide.long[location_or_scale == "location_scale",]
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~ ------------------------------------------------
 #  Save guide ------------------------------------
-saveRDS(guide.long, "outputs/model_guide.Rds")
+saveRDS(guide.long, "builds/batch_models_july_2025/model_guide.Rds")
+
+
+
