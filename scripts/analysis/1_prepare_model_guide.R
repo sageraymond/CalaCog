@@ -1,4 +1,4 @@
-# July 5th 2025
+# July 9th 2025
 #
 # 
 #' *Prepare model guide*
@@ -24,9 +24,9 @@ groundhog.library(libs, groundhog.day)
 # ~~~~~~~~~~~~~~~~~~~~~~~~ ------------------------------------------------
 #  Create full extent model guide ------------------------------------
 
-guide <- CJ(response = c("persistence", "play", "stupidity", "happy", "hoho"),
-            var = c("urbanization", "temperature", "darkness", 
-                    "brightness", "loveliness"),
+guide <- CJ(response = c("Contact_duration", "Inv_duration", "Behav_Complexity", "Lope", "Solves"),
+            var = c("urbanization", "PuzzleType", "Year", "Light", "GroupSize",
+                    "Sex", "temp", "SiteSequence", "Disease"),
             location_or_scale = c("location", "location_scale"))
 
 #' [How to write this in dplyr:]
@@ -39,16 +39,18 @@ guide <- CJ(response = c("persistence", "play", "stupidity", "happy", "hoho"),
 
 # >>> Create formulas -----------------------------------------------------
 
-guide[, null_model_formula := paste(response, "~ 1 + (1|site_id)")]
+#Create null model formulas
+guide[, null_model_formula := paste(response, "~ 1 + (1|SiteID)")]
 
 #' [How to write in dplyr:]
 # guide <- guide %>%
 #   mutate(null_model = paste(response, "~ 1 + (1|site_id"))
 
-guide[, univariate_formula := paste(response, "~", var,  "+ (1|site_id)")]
+#Create univariate formulas
+guide[, univariate_formula := paste(response, "~", var,  "+ (1|SiteID)")]
 guide
 
-guide[, urbanization_formula := paste(response, "~", var, "+ urbanization + (1|site_id)")]
+guide[, urbanization_formula := paste(response, "~", var, "+ urbanization + (1|SiteID)")]
 guide
 
 guide[var == "urbanization", urbanization_formula := NA]
@@ -81,16 +83,16 @@ guide
 # >>> Specify model family -----------------------------------------
 unique(guide$response)
 
-guide[response == "happy", model_family := "gaussian()"]
-guide[response == "hoho", model_family := "binomial(link = 'logit')"]
-guide[response == "persistence", model_family := "poisson()"]
-guide[response == "play", model_family := "nbinom1(link = 'log')"]
-guide[response == "stupidity", model_family := "nbinom2(link = 'log')"]
+guide[response == "Contact_duration", model_family := "gaussian()"]
+guide[response == "Inv_duration", model_family := "gaussian()"]
+guide[response == "Behav_Complexity", model_family := "poisson()"]
+guide[response == "Lope", model_family := "binomial(link = 'logit')"]
+guide[response == "Solves", model_family := "binomial(link = 'logit')"]
 
 
 # >>> Specify zero-inflation models -----------------------------------------
 #' [This should be based on preliminary data exploration]
-guide[, zero_inflation := ifelse(response %in% c("persistence", "play"),
+guide[, zero_inflation := ifelse(response %in% c("Contact_duration", "Inv_duration"),
                                  "yes", "no")]
 guide
 

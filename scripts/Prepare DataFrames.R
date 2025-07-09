@@ -1,6 +1,5 @@
 #Set WD
-setwd("C:/Users/sager/OneDrive/Desktop/school/MSc/Survey Info/Recon_Maps/Cognition/2024_Independent_Variables")
-
+setwd("C:/Users/sager/OneDrive/Desktop/school/MSc/Survey Info/Recon_Maps/Cognition/CalaCog/data/Data to build core dataframe")
 
 #Load libraries
 library(lme4)
@@ -267,7 +266,6 @@ Locations_GIS2 <- Locations_GIS2 %>%
 
 #Read in location data
 LocData <- read.csv("2024Locations_Landscape_Final.csv")
-setwd("C:/Users/sager/OneDrive/Desktop/school/MSc/Survey Info/Recon_Maps/Cognition")
 LocData <- read.csv("2025_City_Site_Data_for_PCA.csv")
 
 #Remove Elk Island Sites because we're just dealing with urbanized sites right now
@@ -759,8 +757,13 @@ FinalData$DateTime <- ifelse(FinalData$EventID_Year_Subject == "SW4_EVENT5_A_202
                              "2025-01-05 12:27:54",
                              FinalData$DateTime)
 
-#write.csv(FinalData, file = "EventDataJul2025.csv")
+FinalData <- as.data.frame(FinalData)
 
+#Convert certain columns to factors
+FinalData$Lope <- ifelse(FinalData$Lope == "Y", 1, 0)
+FinalData$Solves <- ifelse(FinalData$Solves == "Y", 1, 0)
+
+#write.csv(FinalData, file = "EventDataJul2025.csv")
 
 
 
@@ -777,12 +780,12 @@ TotalEvents <- Events %>%
   summarise(TotalEvents = n())
 
 Solves_by_Site <- Events %>%
-  dplyr::filter(Solves == "Y") %>%
+  dplyr::filter(Solves == 1) %>%
   group_by(SiteID) %>%
   summarise(Solves = n())
 
 Lope_by_Site <- Events %>%
-  dplyr::filter(Lope == "Y") %>%
+  dplyr::filter(Lope == 1) %>%
   group_by(SiteID) %>%
   summarise(No.Lope = n())
 
@@ -834,6 +837,7 @@ SummaryData$urbanization <- ifelse(SummaryData$SiteID == "SE3", "City", SummaryD
 SummaryData$urbanization_score <- ifelse(SummaryData$SiteID == "SE3", -0.873909460814067, SummaryData$urbanization_score)
 
 #write.csv(SummaryData, file = "SiteSummaryDataJul2025.csv")
+
 
 
 
