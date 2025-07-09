@@ -1,0 +1,69 @@
+RootFolder,File,RelativePath,DateTime,Identifier,PuzzleType,LorD,SiteID,GroupSize,Memb_group,agesex,UniqueID,Disease,PuzzleSequence
+NE4_Kinnard,Batch1.IMG_0004.MP4,NE4A ,2025-02-20 00:00:10,NE4_EVENT1,A,D,NE4,1,scruffy SM,M,NE4-M2,light mange,0
+NE4_Kinnard,Batch1.IMG_0016.MP4,NE4A ,2025-02-20 15:31:08,NE4_EVENT2,A,L,NE4,1,gap tail,F,NE4-F1,established mange,0
+NE4_Kinnard,Batch1.IMG_0022.MP4,NE4A ,2025-02-21 12:26:10,NE4_EVENT3,A,L,NE4,1,scruffy SM,M,NE4-M2,light mange,0
+NE4_Kinnard,Batch1.IMG_0029.MP4,NE4N ,2025-02-22 23:52:00,NE4_EVENT4,N,D,NE4,1,scruffy SM,M,NE4-M2,light mange,1
+NE4_Kinnard,Batch1.IMG_0047.MP4,NE4A ,2025-02-22 23:52:34,NE4_EVENT4,A,D,NE4,1,scruffy SM,M,NE4-M2,light mange,2
+NE4_Kinnard,Batch1.IMG_0044.MP4,NE4N ,2025-02-23 23:02:52,NE4_EVENT5,N,D,NE4,3,"mangey F, OK F, healthy M","F, F, M","NE4-F2, NE4-F3, NE4-M1","light mange, severe mange, N",1
+NE4_Kinnard,Batch1.IMG_0053.MP4,NE4A ,2025-02-23 23:03:08,NE4_EVENT5,A,D,NE4,3,"mangey F, OK F, healthy M","F, F, M","NE4-F2, NE4-F3, NE4-M1","light mange, severe mange, N",2
+NE4_Kinnard,Batch1.IMG_0045.MP4,NE4N ,2025-02-23 23:03:46,NE4_EVENT5,N,D,NE4,3,"mangey F, OK F, healthy M","F, F, M","NE4-F2, NE4-F3, NE4-M1","light mange, severe mange, N",1
+NE4_Kinnard,Batch1.IMG_0054.MP4,NE4A ,2025-02-23 23:04:14,NE4_EVENT5,A,D,NE4,3,"mangey F, OK F, healthy M","F, F, M","NE4-F2, NE4-F3, NE4-M1","light mange, severe mange, N",2
+NE4_Kinnard,Batch1.IMG_0059.MP4,NE4A ,2025-02-24 08:21:40,NE4_EVENT6,A,L,NE4,1,OK F,F,NE4-F3,light mange,0
+NE4_Kinnard,Batch1.IMG_0055.MP4,NE4N ,2025-02-25 18:33:50,NE4_EVENT7,N,D,NE4,1,scruffy SM,M,NE4-M2,light mange,0
+NE4_Kinnard,Batch1.IMG_0061.MP4,NE4N ,2025-02-26 14:25:58,NE4_EVENT8,N,L,NE4,1,OK F,F,NE4-F3,light mange,1
+NE4_Kinnard,Batch1.IMG_0080.MP4,NE4A ,2025-02-26 14:26:29,NE4_EVENT8,A,L,NE4,1,OK F,F,NE4-F3,light mange,2
+NE4_Kinnard,Batch1.IMG_0084.MP4,NE4N ,2025-02-28 17:09:00,NE4_EVENT9,N,L,NE4,1,scruffy SM,M,NE4-M2,light mange,1
+NE4_Kinnard,Batch1.IMG_0085.MP4,NE4A ,2025-02-28 17:09:14,NE4_EVENT9,A,L,NE4,1,scruffy SM,M,NE4-M2,light mange,2
+NE4_Kinnard,Batch1.IMG_0114.MP4,NE4N ,2025-03-04 16:10:20,NE4_EVENT10,N,L,NE4,1,gap tail,F,NE4-F1,established mange,0
+NE4_Kinnard,Batch1.IMG_0115.MP4,NE4N ,2025-03-04 16:10:45,NE4_EVENT10,N,L,NE4,1,gap tail,F,NE4-F1,established mange,0
+NE4_Kinnard,Batch1.IMG_0156.MP4,NE4A ,2025-03-07 23:19:26,NE4_EVENT11,A,D,NE4,1,scruffy SM,M,NE4-M2,light mange,0
+NE4_Kinnard,Batch1.IMG_0160.MP4,NE4A ,2025-03-10 09:32:12,NE4_EVENT12,A,L,NE4,2,"OK F, healthy M","F, M","NE4-F3, NE4-M1",light mange,0
+NE4_Kinnard,Batch1.IMG_0146.MP4,NE4N ,2025-03-10 10:07:10,NE4_EVENT13,N,L,NE4,1,gap tail,F,NE4-F1,established mange,1
+NE4_Kinnard,Batch1.IMG_0161.MP4,NE4A ,2025-03-10 10:07:20,NE4_EVENT13,A,L,NE4,1,gap tail,F,NE4-F1,established mange,2
+NE4_Kinnard,Batch1.IMG_0170.MP4,NE4A ,2025-03-12 20:48:44,NE4_EVENT14,A,D,NE4,1,,U,NE4-U1,N,0
+NE4_Kinnard,Batch1.IMG_0191.MP4,NE4A ,2025-03-16 00:05:34,NE4_EVENT15,A,D,NE4,1,,U,NE4-U1,N,0
+NE4_Kinnard,Batch1.IMG_0167.MP4,NE4N ,2025-03-17 10:03:54,NE4_EVENT16,N,L,NE4,1,gap tail,F,NE4-F1,established mange,1
+NE4_Kinnard,Batch1.IMG_0205.MP4,NE4A ,2025-03-17 10:04:28,NE4_EVENT16,A,L,NE4,1,gap tail,F,NE4-F1,established mange,2
+NE4_Kinnard,Batch1.IMG_0175.MP4,NE4N ,2025-03-18 11:54:49,NE4_EVENT17,N,L,NE4,1,gap tail,F,NE4-F1,established mange,1
+NE4_Kinnard,Batch1.IMG_0214.MP4,NE4A ,2025-03-18 11:55:26,NE4_EVENT17,A,L,NE4,1,gap tail,F,NE4-F1,established mange,2
+NE4_Kinnard,Batch1.IMG_0189.MP4,NE4N ,2025-03-20 15:37:20,NE4_EVENT18,N,L,NE4,1,gap tail,F,NE4-F1,established mange,0
+NE4_Kinnard,Batch1.IMG_0190.MP4,NE4N ,2025-03-20 17:19:56,NE4_EVENT19,N,L,NE4,1,gap tail,F,NE4-F1,established mange,1
+NE4_Kinnard,Batch1.IMG_0228.MP4,NE4A ,2025-03-20 17:20:18,NE4_EVENT19,A,L,NE4,1,gap tail,F,NE4-F1,established mange,2
+NE4_Kinnard,Batch1.IMG_0191.MP4,NE4N ,2025-03-20 19:29:09,NE4_EVENT20,N,D,NE4,1,gap tail,F,NE4-F1,established mange,1
+NE4_Kinnard,Batch1.IMG_0229.MP4,NE4A ,2025-03-20 19:29:40,NE4_EVENT20,A,D,NE4,1,gap tail,F,NE4-F1,established mange,2
+NE4_Kinnard,Batch1.IMG_0200.MP4,NE4N ,2025-03-21 12:35:44,NE4_EVENT21,N,L,NE4,1,gap tail,F,NE4-F1,established mange,1
+NE4_Kinnard,Batch1.IMG_0234.MP4,NE4A ,2025-03-21 12:36:06,NE4_EVENT21,A,L,NE4,1,gap tail,F,NE4-F1,established mange,2
+NE4_Kinnard,Batch1.IMG_0235.MP4,NE4A ,2025-03-21 13:44:12,NE4_EVENT22,A,L,NE4,1,scruffy SM,M,NE4-M2,light mange,0
+NE4_Kinnard,Batch1.IMG_0201.MP4,NE4N ,2025-03-21 15:01:12,NE4_EVENT23,N,L,NE4,2,"gap tail, scruffy SM","F, M","NE4-F1, NE4-M2","established mange, light mange",1
+NE4_Kinnard,Batch1.IMG_0236.MP4,NE4A ,2025-03-21 15:01:34,NE4_EVENT23,A,L,NE4,2,"gap tail, scruffy SM","F, M","NE4-F1, NE4-M2","established mange, light mange",2
+NE4_Kinnard,Batch1.IMG_0244.MP4,NE4A ,2025-03-23 09:31:14,NE4_EVENT24,A,L,NE4,1,OK F,F,NE4-F3,light mange,0
+NE4_Kinnard,Batch1.IMG_0220.MP4,NE4N ,2025-03-23 19:21:24,NE4_EVENT25,N,D,NE4,1,gap tail,F,NE4-F1,established mange,1
+NE4_Kinnard,Batch1.IMG_0252.MP4,NE4A ,2025-03-23 19:21:52,NE4_EVENT25,A,D,NE4,1,gap tail,F,NE4-F1,established mange,2
+NE4_Kinnard,Batch1.IMG_0261.MP4,NE4A ,2025-03-24 10:49:24,NE4_EVENT26,A,L,NE4,1,OK F,F,NE4-F3,light mange,0
+NE4_Kinnard,Batch1.IMG_0264.MP4,NE4A ,2025-03-24 19:11:54,NE4_EVENT27,A,D,NE4,2,"gap tail, healthy M","F, M","NE4-F1, NE4-M1","established mange, N",0
+NE4_Kinnard,Batch1.IMG_0265.MP4,NE4A ,2025-03-24 19:12:50,NE4_EVENT27,A,D,NE4,2,"gap tail, healthy M","F, M","NE4-F1, NE4-M1","established mange, N",0
+NE4_Kinnard,Batch1.IMG_0266.MP4,NE4A ,2025-03-24 19:27:34,NE4_EVENT28,A,D,NE4,1,scruffy SM,M,NE4-M2,light mange,0
+NE4_Kinnard,Batch1.IMG_0267.MP4,NE4A ,2025-03-24 19:33:42,NE4_EVENT28,A,D,NE4,1,scruffy SM,M,NE4-M2,light mange,0
+NE4_Kinnard,Batch1.IMG_0268.MP4,NE4A ,2025-03-24 21:15:10,NE4_EVENT29,A,D,NE4,1,tail tip,U,NE4-U2,established mange,0
+NE4_Kinnard,Batch1.IMG_0269.MP4,NE4A ,2025-03-25 08:18:46,NE4_EVENT30,A,L,NE4,3,"tail tip, scruffy SM, OK F","U, M, F","NE4-U2, NE4-M2, NE4-F3","established mange, light mange, light mange",0
+NE4_Kinnard,Batch1.IMG_0270.MP4,NE4A ,2025-03-25 08:19:08,NE4_EVENT30,A,L,NE4,3,"tail tip, scruffy SM, OK F","U, M, F","NE4-U2, NE4-M2, NE4-F3","established mange, light mange, light mange",0
+NE4_Kinnard,Batch1.IMG_0271.MP4,NE4A ,2025-03-25 08:21:10,NE4_EVENT30,A,L,NE4,3,"tail tip, scruffy SM, OK F","U, M, F","NE4-U2, NE4-M2, NE4-F3","established mange, light mange, light mange",0
+NE4_Kinnard,Batch2.IMG_0003.MP4,NE4N ,2025-03-25 19:51:30,NE4_EVENT31,N,D,NE4,1,tail gap,F,NE4-F1,"established mange, light mange",1
+NE4_Kinnard,Batch2.IMG_0003.MP4,NE4A ,2025-03-25 19:52:02,NE4_EVENT31,A,D,NE4,1,tail gap,F,NE4-F1,"established mange, light mange",2
+NE4_Kinnard,Batch2.IMG_0009.MP4,NE4N ,2025-03-28 16:24:48,NE4_EVENT32,N,L,NE4,1,tail tip,U,NE4-U2,established mange,1
+NE4_Kinnard,Batch2.IMG_0015.MP4,NE4A ,2025-03-28 16:25:18,NE4_EVENT32,A,L,NE4,1,tail tip,U,NE4-U2,established mange,2
+NE4_Kinnard,Batch2.IMG_0010.MP4,NE4N ,2025-03-28 16:33:40,NE4_EVENT33,N,L,NE4,2,"tail gap, scruffy SM","F, M","NE4-F1, NE4-M2","established mange, light mange",1
+NE4_Kinnard,Batch2.IMG_0016.MP4,NE4A ,2025-03-28 16:34:00,NE4_EVENT33,A,L,NE4,2,"tail gap, scruffy SM","F, M","NE4-F1, NE4-M2","established mange, light mange",2
+NE4_Kinnard,Batch2.IMG_0029.MP4,NE4A ,2025-03-30 11:31:26,NE4_EVENT34,A,L,NE4,1,scruffy F,F,NE4-F4,established mange,0
+NE4_Kinnard,Batch2.IMG_0028.MP4,NE4N ,2025-04-04 15:25:06,NE4_EVENT35,N,L,NE4,1,gap tail,F,NE4-F1,established mange,1
+NE4_Kinnard,Batch2.IMG_0045.MP4,NE4A ,2025-04-04 15:25:24,NE4_EVENT35,A,L,NE4,1,gap tail,F,NE4-F1,established mange,2
+NE4_Kinnard,Batch2.IMG_0029.MP4,NE4N ,2025-04-04 15:28:40,NE4_EVENT35,N,L,NE4,1,gap tail,F,NE4-F1,established mange,1
+NE4_Kinnard,Batch2.IMG_0046.MP4,NE4A ,2025-04-04 15:29:14,NE4_EVENT35,A,L,NE4,1,gap tail,F,NE4-F1,established mange,2
+NE4_Kinnard,Batch2.IMG_0034.MP4,NE4N ,2025-04-05 16:44:06,NE4_EVENT36,N,L,NE4,1,gap tail,F,NE4-F1,established mange,1
+NE4_Kinnard,Batch2.IMG_0051.MP4,NE4A ,2025-04-05 16:44:36,NE4_EVENT36,A,L,NE4,1,gap tail,F,NE4-F1,established mange,2
+NE4_Kinnard,Batch2.IMG_0052.MP4,NE4A ,2025-04-05 19:39:10,NE4_EVENT37,A,D,NE4,2,"tail tip, scruffy SM","U, M","NE4-U2, NE4-M2","established mange, light mange",0
+NE4_Kinnard,Batch2.IMG_0058.MP4,NE4A ,2025-04-07 05:30:54,NE4_EVENT38,A,D,NE4,1,tail tip,U,NE4-U2,established mange,0
+NE4_Kinnard,Batch2.IMG_0059.MP4,NE4A ,2025-04-07 05:31:16,NE4_EVENT38,A,D,NE4,1,tail tip,U,NE4-U2,established mange,0
+NE4_Kinnard,Batch2.IMG_0060.MP4,NE4A ,2025-04-07 05:31:36,NE4_EVENT38,A,D,NE4,1,tail tip,U,NE4-U2,established mange,0
+NE4_Kinnard,Batch2.IMG_0061.MP4,NE4A ,2025-04-07 19:38:30,NE4_EVENT39,A,D,NE4,1,scruffy F,F,NE4-F4,established mange,0
+NE4_Kinnard,Batch2.IMG_0064.MP4,NE4A ,2025-04-08 23:09:38,NE4_EVENT40,A,D,NE4,1,scruffy F,F,NE4-F4,established mange,0

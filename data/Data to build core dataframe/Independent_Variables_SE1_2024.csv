@@ -1,0 +1,7 @@
+RootFolder,File,RelativePath,DateTime,DeleteFlag,Identifier,PuzzleType,LorD,SiteID,GroupSize,Memb_group,agesex,UniqueID,Disease,PuzzleSequence,
+SE1,SE1N.IMG_0022.MP4,, 2024-02-08 04:09:14,false,SE1_EVENT1,W,D,SE1,1,,Unk,SE1-U1,N,0,
+SE1,SE1N.IMG_0023.MP4,, 2024-02-08 04:09:38,false,SE1_EVENT1,W,D,SE1,1,,Unk,SE1-U1,N,0,
+SE1,SE1N.IMG_0039.MP4,, 2024-02-12 22:06:48,false,SE1_EVENT2,W,D,SE1,1,,Unk,SE1-U1,N,1,
+SE1,SE1A.IMG_0062.MP4,, 2024-02-12 22:07:20,false,SE1_EVENT2,A,D,SE1,1,,Unk,SE1-U1,N,2,
+SE1,SE1N.second_round.IMG_0024.MP4,, 2024-02-19 09:53:16,false,SE1_EVENT3,W,L,SE1,1,,Unk,SE1-U1,N,0,
+SE1,SE1N.second_round.IMG_0025.MP4,, 2024-02-19 09:53:36,false,SE1_EVENT3,W,L,SE1,1,,Unk,SE1-U1,N,0,

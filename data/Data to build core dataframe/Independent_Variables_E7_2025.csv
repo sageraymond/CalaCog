@@ -1,0 +1,15 @@
+RootFolder,File,RelativePath,DateTime,Identifier,PuzzleType,LorD,SiteID,GroupSize,Memb_group,agesex,UniqueID,Disease,PuzzleSequence
+E7_VisitorCenter,Batch1.IMG_0014.AVI,N ,2025-02-17 19:05:52,E7_EVENT1,N,D,E7,1,chubby,SF,E7-SF1,N,0
+E7_VisitorCenter,Batch1.IMG_0015.AVI,N ,2025-02-17 21:47:30,E7_EVENT2,N,D,E7,1,chubby,SF,E7-SF1,N,0
+E7_VisitorCenter,Batch1.IMG_0041.AVI,N ,2025-02-24 19:17:18,E7_EVENT3,N,D,E7,1,chubby,SF,E7-SF1,N,0
+E7_VisitorCenter,Batch1.IMG_0042.AVI,N ,2025-02-25 01:07:36,E7_EVENT4,N,D,E7,1,funny fur patch on right side,M,E7-M1,mange?,0
+E7_VisitorCenter,Batch1.IMG_0162.AVI,N ,2025-03-04 01:15:10,E7_EVENT5,N,D,E7,1,super mangey tail,SM,E7-SM1,super mangey tail,0
+E7_VisitorCenter,100_BTCF.IMG_0039.MP4,A ,2025-03-04 01:15:22,E7_EVENT6,A,D,E7,1,,U,E7-U1,N,0
+E7_VisitorCenter,Batch2.IMG_0003.AVI,N ,2025-03-06 18:36:48,E7_EVENT7,N,D,E7,1,chubby,SF,E7-SF1,N,0
+E7_VisitorCenter,Batch2.IMG_0004.AVI,N ,2025-03-07 00:08:52,E7_EVENT8,N,D,E7,1,mangey front,SF,E7-SF2,mange,0
+E7_VisitorCenter,Batch2.IMG_0031.AVI,N ,2025-03-21 04:15:30,E7_EVENT9,N,D,E7,1,super mangey tail,SM,E7-SM1,mange,0
+E7_VisitorCenter,Batch2.IMG_0039.AVI,N ,2025-03-23 22:01:52,E7_EVENT10,N,D,E7,1,one eye blind,SF,E7-SF3,one eye blind,0
+E7_VisitorCenter,Batch2.IMG_0040.AVI,N ,2025-03-24 03:51:40,E7_EVENT11,N,D,E7,1,chubby,SF,E7-SF1,N,0
+E7_VisitorCenter,100_BTCF.IMG_0097.MP4,A ,2025-03-29 22:08:50,E7_EVENT12,A,D,E7,2,"chubby, unknown","SF, U","E7-SF1, E7-U1","N, N",0
+E7_VisitorCenter,100_BTCF.IMG_0098.MP4,A ,2025-03-29 23:04:46,E7_EVENT13,A,D,E7,1,funny fur patch on right side,M,E7-M1,mange?,0
+E7_VisitorCenter,100_BTCF.IMG_0115.MP4,A ,2025-04-12 00:56:40,E7_EVENT14,A,D,E7,1,,U,E7-U1,N,0

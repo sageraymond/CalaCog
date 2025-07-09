@@ -1,0 +1,4 @@
+RootFolder,File,RelativePath,DateTime,DeleteFlag,Identifier,PuzzleType,LorD,SiteID,GroupSize,Memb_group,agesex,UniqueID,Disease,PuzzleSequence,
+E12,E12A.IMG_0011.AVI,, 2024-03-14 05:51:28,false,E12_EVENT1,A,D,E12,1,1,Unk,E12-U1,N,1,
+E12,E12N.IMG_0006.AVI,, 2024-03-14 05:52:24,false,E12_EVENT1,W,D,E12,1,,Unk,E12-U1,N,2,
+E12,E12A.IMG_0016.AVI,, 2024-03-29 09:38:34,false,E12_EVENT2,A,L,E12,1,,Unk,E12-U2,N,0,

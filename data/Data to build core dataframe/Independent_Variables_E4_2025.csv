@@ -1,0 +1,25 @@
+RootFolder,File,RelativePath,DateTime,Identifier,PuzzleType,LorD,SiteID,GroupSize,Memb_group,agesex,UniqueID,Disease,PuzzleSequence
+E4_Shoreline,Batch1.IMG_0011.AVI,A ,2025-02-20 18:17:34,E4_EVENT1,A,D,E4,2,"fatty, nose scar","M, F","E4-F1, E4-M1",N,0
+E4_Shoreline,Batch1.IMG_0012.AVI,A ,2025-02-20 18:19:14,E4_EVENT1,A,D,E4,2,"fatty, nose scar","M, F","E4-F1, E4-M1",N,0
+E4_Shoreline,Batch1.IMG_0022.AVI,N ,2025-02-24 07:28:18,E4_EVENT2,N,L,E4,1,nose scar,F,E4-F1,N,1
+E4_Shoreline,Batch1.IMG_0023.AVI,N ,2025-02-24 07:28:40,E4_EVENT2,N,L,E4,1,nose scar,F,E4-F1,N,1
+E4_Shoreline,Batch1.IMG_0014.AVI,A ,2025-02-24 07:29:50,E4_EVENT2,A,L,E4,1,nose scar,F,E4-F1,N,2
+E4_Shoreline,Batch1.IMG_0026.AVI,N ,2025-02-26 01:09:30,E4_EVENT3,N,D,E4,1,,U,E4-U1,N,0
+E4_Shoreline,Batch1.IMG_0027.AVI,N ,2025-02-28 08:49:42,E4_EVENT4,N,L,E4,1,,U,E4-U1,N,0
+E4_Shoreline,Batch2.IMG_0001.AVI,N ,2025-03-06 10:16:42,E4_EVENT5,N,L,E4,1,nose scar,F,E4-F1,N,1
+E4_Shoreline,Batch1.IMG_0034.AVI,A ,2025-03-06 10:17:32,E4_EVENT5,A,L,E4,1,nose scar,F,E4-F1,N,2
+E4_Shoreline,Batch2.IMG_0003.AVI,N ,2025-03-07 19:12:44,E4_EVENT6,N,D,E4,1,fatty,M,E4-M1,N,0
+E4_Shoreline,Batch2.IMG_0014.AVI,N ,2025-03-12 22:26:18,E4_EVENT7,N,D,E4,1,mangey tail,SM,E4-SM1,mangey tail,0
+E4_Shoreline,Batch1.IMG_0069.AVI,A ,2025-03-21 23:22:08,E4_EVENT8,A,D,E4,1,mangey tail,SM,E4-SM1,mangey tail,1
+E4_Shoreline,Batch2.IMG_0043.AVI,N ,2025-03-21 23:22:18,E4_EVENT8,N,D,E4,1,mangey tail,SM,E4-SM1,mangey tail,2
+E4_Shoreline,Batch2.IMG_0049.AVI,N ,2025-03-22 22:25:14,E4_EVENT9,N,D,E4,1,,U,E4-U1,N,0
+E4_Shoreline,Batch2.IMG_0050.AVI,N ,2025-03-23 02:23:42,E4_EVENT10,N,D,E4,1,,U,E4-U1,N,0
+E4_Shoreline,Batch2.IMG_0007.AVI,A ,2025-04-02 17:37:00,E4_EVENT11,A,L,E4,1,,U,E4-U1,N,1
+E4_Shoreline,Batch2.IMG_0008.AVI,A ,2025-04-02 17:37:22,E4_EVENT11,A,L,E4,1,,U,E4-U1,N,1
+E4_Shoreline,Batch2.IMG_0009.AVI,A ,2025-04-02 17:37:44,E4_EVENT11,A,L,E4,1,,U,E4-U1,N,1
+E4_Shoreline,Batch2.IMG_0061.AVI,N ,2025-04-02 17:38:20,E4_EVENT11,N,L,E4,1,,U,E4-U1,N,2
+E4_Shoreline,Batch2.IMG_0062.AVI,N ,2025-04-02 17:39:10,E4_EVENT11,N,L,E4,1,,U,E4-U1,N,2
+E4_Shoreline,Batch2.IMG_0010.AVI,A ,2025-04-02 17:52:08,E4_EVENT12,A,L,E4,1,,U,E4-U1,N,1
+E4_Shoreline,Batch2.IMG_0063.AVI,N ,2025-04-02 17:52:20,E4_EVENT12,N,L,E4,1,,U,E4-U1,N,2
+E4_Shoreline,Batch2.IMG_0025.AVI,A ,2025-04-16 00:04:46,E4_EVENT13,A,D,E4,1,nose scar,F,E4-F1,N,0
+E4_Shoreline,Batch2.IMG_0065.AVI,N ,2025-04-16 20:31:18,E4_EVENT14,N,D,E4,2,"fatty, nose scar","M, F","E4-F1, E4-M1",N,0

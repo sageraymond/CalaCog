@@ -1,0 +1,7 @@
+RootFolder,File,RelativePath,DateTime,DeleteFlag,Identifier,PuzzleType,LorD,SiteID,GroupSize,Memb_group,agesex,UniqueID,Disease,PuzzleSequence,
+NE4,NE4N.IMG_0012.MP4,, 2024-02-07 23:39:34,false,NE4_EVENT1,W,D,NE4,1,,M,NE4-M1,N,1,
+NE4,NE4A.IMG_0040.MP4,, 2024-02-07 23:39:42,false,NE4_EVENT1,A,D,NE4,1,,M,NE4-M1,N,2,
+NE4,NE4N.IMG_0013.MP4,, 2024-02-08 13:16:18,false,NE4_EVENT2,W,N,NE4,1,,F,NE4-F1,"scruffy, dark bum",0,
+NE4,NE4N.IMG_0022.MP4,, 2024-02-08 18:20:56,false,NE4_EVENT3,W,D,NE4,1,,Unk,NE4-U1,N,0,
+NE4,NE4N.IMG_0023.MP4,, 2024-02-08 23:50:16,false,NE4_EVENT4,W,D,NE4,1,,F,NE4-F1,"scruffy, dark bum",0,
+NE4,NE4N.IMG_0027.MP4,, 2024-02-10 17:41:50,false,NE4_EVENT5,W,N,NE4,1,,M,NE4-M1,N,0,

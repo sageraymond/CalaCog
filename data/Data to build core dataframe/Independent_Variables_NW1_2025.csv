@@ -1,0 +1,5 @@
+RootFolder,File,RelativePath,DateTime,Identifier,PuzzleType,LorD,SiteID,GroupSize,Memb_group,agesex,UniqueID,Disease,PuzzleSequence
+NW1_Dunluce,100_BTCF.IMG_0008.MP4,NW1N ,2025-01-05 22:47:08,NW1_EVENT1,N,D,NW1,1,,U,NW1-U1,N,0
+NW1_Dunluce,Batch2.IMG_0015.MP4,NW1A ,2025-02-05 15:50:42,NW1_EVENT2,A,L,NW1,1,"scruffy, mange",SF,NW1-SF1,light mange,0
+NW1_Dunluce,Batch2.IMG_0020.MP4,NW1A ,2025-02-07 04:29:58,NW1_EVENT3,A,D,NW1,1,"scruffy, mange",SF,NW1-SF1,light mange,0
+NW1_Dunluce,Batch2.IMG_0021.MP4,NW1A ,2025-02-07 04:30:06,NW1_EVENT3,A,D,NW1,1,"scruffy, mange",SF,NW1-SF1,light mange,0

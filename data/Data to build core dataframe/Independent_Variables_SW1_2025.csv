@@ -1,0 +1,9 @@
+RootFolder,File,RelativePath,DateTime,Identifier,PuzzleType,LorD,SiteID,GroupSize,Memb_group,agesex,UniqueID,Disease,PuzzleSequence
+SW1_Saville,100_BTCF.IMG_0017.MP4,SW1N ,2025-01-07 17:02:42,SW1_EVENT1,N,D,SW1,1,slightly suboptimal tail,SM,SW1-SM1,N,0
+SW1_Saville,100_BTCF.IMG_0029.MP4,SW1N ,2025-01-13 08:07:18,SW1_EVENT2,N,D,SW1,1,chunky,SF,SW1-SF1,N,0
+SW1_Saville,100_BTCF.IMG_0054.MP4,SW1N ,2025-01-22 07:49:28,SW1_EVENT3,N,D,SW1,4,"slightly suboptimal tail, chunky","SF, SM, U, U","SW1-SF1, SW1-SM1, SW1-U1, SW1-U2",N,0
+SW1_Saville,100_BTCF.IMG_0055.MP4,SW1N ,2025-01-22 08:01:42,SW1_EVENT3,N,D,SW1,4,"slightly suboptimal tail, chunky","SF, SM, U, U","SW1-SF1, SW1-SM1, SW1-U1, SW1-U2",N,0
+SW1_Saville,100_BTCF.IMG_0143.MP4,SW1A ,2025-01-31 06:55:48,SW1_EVENT4,A,D,SW1,1,slightly suboptimal tail,SM,SW1-SM1,N,0
+SW1_Saville,100_BTCF.IMG_0090.MP4,SW1N ,2025-01-31 22:50:36,SW1_EVENT5,N,D,SW1,1,slightly suboptimal tail,SM,SW1-SM1,N,0
+SW1_Saville,100_BTCF.IMG_0154.MP4,SW1A ,2025-02-04 22:59:18,SW1_EVENT6,A,D,SW1,1,,U,SW1-U1,N,0
+SW1_Saville,100_BTCF.IMG_0099.MP4,SW1N ,2025-02-14 12:48:48,SW1_EVENT7,N,L,SW1,1,chunky,SF,SW1-SF1,N,0

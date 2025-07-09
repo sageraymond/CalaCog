@@ -1,0 +1,4 @@
+RootFolder,File,RelativePath,DateTime,DeleteFlag,Identifier,PuzzleType,LorD,SiteID,GroupSize,Memb_group,agesex,UniqueID,Disease,PuzzleSequence,
+NE3,NE3A.IMG_0025.MP4,, 2024-02-13 06:27:48,false,NE3_EVENT1,A,D,NE3,1,,SM,NE3-SM1,N,0,
+NE3,NE3A.one_of_those_riverside_sites.IMG_0014.MP4,, 2024-02-25 02:35:20,false,NE3_EVENT2,A,D,NE3,1,,F,NE3-F1,N,0,
+NE3,NE3A.one_of_those_riverside_sites.IMG_0015.MP4,, 2024-02-25 02:35:42,false,NE3_EVENT2,A,D,NE3,1,,F,NE3-F1,N,0,

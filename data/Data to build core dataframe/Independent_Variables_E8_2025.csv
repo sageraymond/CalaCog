@@ -1,0 +1,15 @@
+RootFolder,File,RelativePath,DateTime,Identifier,PuzzleType,LorD,SiteID,GroupSize,Memb_group,agesex,UniqueID,Disease,PuzzleSequence
+E8,100_BTCF.IMG_0007.AVI,E8A ,2025-01-05 19:18:58,E8_EVENT1,A,D,E8,1,"discoloration/ kink on tail, chubby",M,E8-M1,N,1
+E8,100_BTCF.IMG_0021.AVI,E8N ,2025-01-05 19:19:00,E8_EVENT1,N,D,E8,1,"discoloration/ kink on tail, chubby",M,E8-M1,N,2
+E8,100_BTCF.IMG_0022.AVI,E8N ,2025-01-05 22:12:16,E8_EVENT2,N,D,E8,1,,SF,E8-SF1,N,0
+E8,100_BTCF.IMG_0035.AVI,E8N ,2025-01-12 20:31:50,E8_EVENT3,N,D,E8,1,"discoloration/ kink on tail, chubby",M,E8-SM1,N,0
+E8,100_BTCF.IMG_0036.AVI,E8N ,2025-01-12 20:32:24,E8_EVENT3,N,D,E8,1,"discoloration/ kink on tail, chubby",M,E8-SM1,N,0
+E8,100_BTCF.IMG_0037.AVI,E8N ,2025-01-12 20:33:04,E8_EVENT3,N,D,E8,1,"discoloration/ kink on tail, chubby",M,E8-SM1,N,0
+E8,100_BTCF.IMG_0044.AVI,E8N ,2025-01-15 17:52:04,E8_EVENT4,N,D,E8,1,,U,E8-U1,N,0
+E8,100_BTCF.IMG_0069.AVI,E8N ,2025-01-26 13:36:52,E8_EVENT5,N,L,E8,1,slightly janky gait,U,E8-U2,slight limp,0
+E8,100_BTCF.IMG_0083.AVI,E8N ,2025-02-01 18:55:32,E8_EVENT6,N,D,E8,1,,U,E8-U3,N,0
+E8,100_BTCF.IMG_0047.AVI,E8A ,2025-02-01 19:49:38,E8_EVENT7,A,D,E8,2,"discoloration/ kink on tail, chubby",F + M,E8-F1 + E8-M1,N,1
+E8,100_BTCF.IMG_0048.AVI,E8A ,2025-02-01 19:50:00,E8_EVENT7,A,D,E8,2,"discoloration/ kink on tail, chubby",F + M,E8-F1 + E8-M1,N,1
+E8,100_BTCF.IMG_0084.AVI,E8N ,2025-02-01 19:50:06,E8_EVENT7,W,D,E8,2,"discoloration/ kink on tail, chubby",F + M,E8-F1 + E8-M1,N,2
+E8,100_BTCF.IMG_0085.AVI,E8N ,2025-02-01 19:50:28,E8_EVENT7,W,D,E8,2,"discoloration/ kink on tail, chubby",F + M,E8-F1 + E8-M1,N,2
+E8,100_BTCF.IMG_0087.AVI,E8N ,2025-02-03 14:45:48,E8_EVENT8,N,L,E8,1,slightly janky gait,U,E8-U2,slight limp,0
