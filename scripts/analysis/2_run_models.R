@@ -48,7 +48,7 @@ unique(guide$model_call)
 guide[location_or_scale == "location_scale"]$model_call
 guide[location_or_scale == "location_scale" & zero_inflation == "yes"]$model_call
 
-#' [I suspect that Year wants to be treated categorically, not continuously, right?]
+#' [Year wants to be treated categorically, not continuously]
 #' *We wouldn't hypothesize a linear relationship to year would we?*
 dat[, Year := as.factor(Year)]
 unique(dat$Sex)
@@ -115,7 +115,7 @@ for(i in 1:nrow(working_guide)){
 warnings
 
 working_guide <- guide[!file.exists(model_path), ]
-working_guide
+working_guide #about 700 didjn't run...
 #' [Somehow this increased from 2 to 19 when I fixed a couple errors in the dispformula...But then I made Year a factor and it went down to 2]
 
 # >>> Test the models that didn't run -------------------------------------
@@ -161,4 +161,5 @@ plot(dat[complete.cases(Contact_duration, urbanization_score, SiteID)]$Contact_d
 #' guide[!file.exists(model_path), ]
 #' 
 #' guide[file.exists(model_path), ]
+
 

@@ -6,16 +6,470 @@ library(ggplot2)
 library(data.table)
 library(DHARMa)
 library(dplyr)
+library(broom.mixed)
 
 # Load data --------------------------------------------------------------
 
 sitedata <- read.csv("data/SiteSummaryDataJul2025.csv")
 sitedata <- as.data.frame(sitedata)
 
+#Code urbanization as factor
+sitedata$urbanization <- factor(sitedata$urbanization, levels = c("Wild", "City"))
+
+
 # Remove SE3 where there were no events
 sitedata <- sitedata %>% dplyr::filter(SiteID != "SE3")
 
-#Step 1: Wild vs. City
+#Create offset column
+sitedata$offset <- log(sitedata$TotalEvents)
+
+#Step 1:Write a function to create models (null + univariate + dispformula)
+build_models <- function(data, outcomes, predictor, offset_var, dispformula, family = nbinom2()) {
+  models <- list()
+  
+  for (outcome in outcomes) {
+    # Null model
+    null_formula <- as.formula(
+      paste0(outcome, " ~ 1 + offset(", offset_var, ")")
+    )
+    null_model <- glmmTMB(null_formula, data = data, family = family)
+    
+    # Univariate model
+    uni_formula <- as.formula(
+      paste0(outcome, " ~ ", predictor, " + offset(", offset_var, ")")
+    )
+    uni_model <- glmmTMB(uni_formula, data = data, family = family)
+    
+    # Univariate model with dispersion formula
+    disp_model <- glmmTMB(uni_formula, data = data, family = family, dispformula = dispformula)
+    
+    # Store all three models
+    models[[outcome]] <- list(
+      null = null_model,
+      univariate = uni_model,
+      disp = disp_model
+    )
+  }
+  
+  return(models)
+}
+
+#Apply to my data
+model_list <- build_models(
+  data = sitedata,
+  outcomes = c("Solves", "No.Lope", "No.Contact", "No.Inv"),
+  predictor = "urbanization",
+  offset_var = "offset",
+  dispformula = ~urbanization,
+  family = nbinom2()
+)
+
+
+#Step 2. Determine whether models perform better than null
+#Build function to compare
+Null.v.Uni.lrt <- function(model_list) {
+  lrt_results <- list()
+  
+  for (outcome in names(model_list)) {
+    null_mod <- model_list[[outcome]]$null
+    uni_mod <- model_list[[outcome]]$univariate
+    
+        lrt <- anova(null_mod, uni_mod, test = "Chisq")
+    
+    lrt_results[[outcome]] <- lrt
+  }
+  
+  return(lrt_results)
+}
+
+#Now apply function to the model list i already made:
+lrt_results <- Null.v.Uni.lrt(model_list)
+lrt_results
+#Look like the univariate is better than the null in all cases. This is good
+
+
+#Step 3. Determine whether models perform better with disp formula
+Uni.v.Disp.lrt <- function(model_list) {
+  lrt_results <- list()
+  
+  for (outcome in names(model_list)) {
+    uni_mod <- model_list[[outcome]]$univariate
+    disp_mod <- model_list[[outcome]]$disp
+    
+    
+    lrt <- anova(uni_mod, disp_mod, test = "Chisq")
+    
+    lrt_results[[outcome]] <- lrt
+  }
+  
+  return(lrt_results)
+}
+
+#Apply to my data
+lrt_results <- Uni.v.Disp.lrt(model_list)
+lrt_results
+#This improved model results for Investigate only
+
+
+#Step 4. Store your best models
+best_models <- list(
+  Solves = model_list$Solves$univariate,
+  No.Lope = model_list$No.Lope$univariate,
+  No.Contact = model_list$No.Contact$univariate,
+  No.Inv = model_list$No.Inv$disp
+)
+
+#Store nulls too
+null_models <- lapply(names(best_models), function(name) model_list[[name]]$null)
+names(null_models) <- names(best_models)
+
+
+#Step 5. Put their information in a table
+summarize_models <- function(model_list, null_models, predictor_base = "urbanization") {
+
+  summary_table <- lapply(names(model_list), function(outcome) {
+    model <- model_list[[outcome]]
+    null_model <- null_models[[outcome]]
+    
+    fixed_coefs <- tidy(model, effects = "fixed", conf.int = TRUE) #extract fixef
+    
+    term_row <- fixed_coefs %>% filter(grepl(predictor_base, term)) #id predictor
+    
+    if (nrow(term_row) == 0) {
+      warning(paste("Predictor term not found in mean model for", outcome))
+      beta <- ci_low <- ci_high <- rr <- rr_low <- rr_high <- beta_p <- NA
+      beta_term <- NA
+    } else {
+      beta_term <- term_row$term[1]
+      beta <- term_row$estimate[1]
+      ci_low <- term_row$conf.low[1]
+      ci_high <- term_row$conf.high[1]
+      beta_p <- term_row$p.value[1]
+      rr <- exp(beta)
+      rr_low <- exp(ci_low)
+      rr_high <- exp(ci_high)
+    }
+    
+    lrt <- tryCatch({ #LR test. I dont know what the trycatch is doing here...
+      anova(null_model, model, test = "Chisq")
+    }, error = function(e) {
+      warning(paste("LRT failed for", outcome))
+      return(NULL)
+    })
+    
+    lrt_p <- if (!is.null(lrt)) lrt$`Pr(>Chisq)`[2] else NA
+    
+    disp_coefs <- tryCatch({ #extract disp formula... seems broken
+      tidy(model, effects = "disp", conf.int = TRUE)
+    }, error = function(e) NULL)
+    
+    disp_row <- if (!is.null(disp_coefs)) disp_coefs %>% filter(grepl(predictor_base, term)) else NULL
+    
+    if (!is.null(disp_row) && nrow(disp_row) > 0) {
+      disp_term <- disp_row$term[1]
+      disp_beta <- disp_row$estimate[1]
+      disp_ci_low <- disp_row$conf.low[1]
+      disp_ci_high <- disp_row$conf.high[1]
+    } else {
+      disp_term <- disp_beta <- disp_ci_low <- disp_ci_high <- NA
+    }
+    
+    data.frame(
+      outcome = outcome,
+      beta_term = beta_term,
+      beta = beta,
+      beta_p = beta_p,
+      ci_lower = ci_low,
+      ci_upper = ci_high,
+      rate_ratio = rr,
+      rr_ci_lower = rr_low,
+      rr_ci_upper = rr_high,
+      AIC = AIC(model),
+      LRT_p = lrt_p,
+      disp_term = disp_term,
+      disp_beta = disp_beta,
+      disp_ci_lower = disp_ci_low,
+      disp_ci_upper = disp_ci_high
+    )
+  }) %>% bind_rows()
+  
+  return(summary_table)
+}
+
+#Apply to my data (best models)
+summary <- summarize_models(best_models, null_models)
+
+summary
+
+
+
+
+#Repeat for urbanization score, which is now actually something else
+#Filter to city sites only
+citysites <- sitedata %>%
+  dplyr::filter(urbanization == "City")
+
+#Step 1. I need to built a new function that can deal with > 1 predictor
+build_models2 <- function(data, outcomes, predictors, offset_var, family = nbinom2()) {
+  models <- list()
+  
+  for (outcome in outcomes) {
+    models[[outcome]] <- list()
+    
+    for (predictor in predictors) {
+      # Null model
+      null_formula <- as.formula(
+        paste0(outcome, " ~ 1 + offset(", offset_var, ")")
+      )
+      null_model <- glmmTMB(null_formula, data = data, family = family)
+      
+      # Univariate model
+      uni_formula <- as.formula(
+        paste0(outcome, " ~ ", predictor, " + offset(", offset_var, ")")
+      )
+      uni_model <- glmmTMB(uni_formula, data = data, family = family)
+      
+      # Dispersion formula: ~ predictor (built dynamically)
+      disp_formula <- as.formula(paste0("~", predictor))
+      
+      # Univariate model with dispersion
+      disp_model <- glmmTMB(uni_formula, data = data, family = family, dispformula = disp_formula)
+      
+      # Store models
+      models[[outcome]][[predictor]] <- list(
+        null = null_model,
+        univariate = uni_model,
+        disp = disp_model
+      )
+    }
+  }
+  
+  return(models)
+}
+
+
+#Apply to my data
+model_list <- build_models2(
+  data = citysites,
+  outcomes = c("Solves", "No.Lope", "No.Contact", "No.Inv"),
+  predictors = c("Road.density", "pop_density", "ANTH", "NAT", "Nat50", "Nat100", "Nat250"),
+  offset_var = "offset",
+  family = nbinom2()
+) 
+
+#Check a few of these dudes
+fixef(model_list$Solves$pop_density$null)
+fixef(model_list$Solves$pop_density$univariate)
+fixef(model_list$Solves$pop_density$disp)
+
+fixef(model_list$No.Lope$pop_density$null)
+fixef(model_list$No.Lope$pop_density$univariate)
+fixef(model_list$No.Lope$pop_density$disp)
+
+fixef(model_list$No.Lope$Road.density$null)
+fixef(model_list$No.Lope$Road.density$univariate)
+fixef(model_list$No.Lope$Road.density$disp)
+
+fixef(model_list$No.Inv$ANTH$null)
+fixef(model_list$No.Inv$ANTH$univariate)
+fixef(model_list$No.Inv$ANTH$disp)
+
+fixef(model_list$No.Inv$NAT$null)
+fixef(model_list$No.Inv$NAT$univariate)
+fixef(model_list$No.Inv$NAT$disp)
+
+fixef(model_list$No.Inv$Nat50$null)
+fixef(model_list$No.Inv$Nat50$univariate)
+fixef(model_list$No.Inv$Nat50$disp)
+
+
+
+#Step 2. Determine whether models perform better than null
+#Build function to compare
+Null.v.Uni.lrt <- function(model_list) {
+  lrt_results <- list()
+  
+  for (outcome in names(model_list)) {
+    for (predictor in names(model_list[[outcome]])) {
+      mods <- model_list[[outcome]][[predictor]]
+      
+      if (is.null(mods$null) || is.null(mods$univariate)) {
+        message(paste("Skipping", outcome, predictor, "- null or univariate model missing"))
+        next
+      }
+      
+      lrt <- tryCatch({
+        anova(mods$null, mods$univariate, test = "Chisq")
+      }, error = function(e) {
+        message(paste("LRT failed for", outcome, predictor, ":", e$message))
+        return(NULL)
+      })
+      
+      if (is.null(lrt)) {
+        message(paste("LRT returned NULL for", outcome, predictor))
+        next
+      }
+      
+      lrt_results[[paste(outcome, predictor, sep = "_")]] <- lrt
+    }
+  }
+  
+  return(lrt_results)
+}
+
+
+#Now apply function to the model list i already made:
+lrt_results <- Null.v.Uni.lrt(model_list)
+
+#The univariate does not always improve model perfomance...
+lrt_results
+#It does under following circs:
+#Solves + Nat50
+#Solves pluys nat 100
+#No.Inv plus nat50
+#No.Inv plus nat100
+
+
+
+#Step 3. Determine whether models perform better with disp formula
+Uni.v.Disp.lrt <- function(model_list) {
+  lrt_results <- list()
+  
+  for (outcome in names(model_list)) {
+    uni_mod <- model_list[[outcome]]$univariate
+    disp_mod <- model_list[[outcome]]$disp
+    
+    
+    lrt <- anova(uni_mod, disp_mod, test = "Chisq")
+    
+    lrt_results[[outcome]] <- lrt
+  }
+  
+  return(lrt_results)
+}
+
+#Apply to my data
+lrt_results <- Uni.v.Disp.lrt(model_list)
+#This improved model results for Investigate only
+
+
+#Step 4. Store your best models
+best_models <- list(
+  Solves = model_list$Solves$univariate,
+  No.Lope = model_list$No.Lope$univariate,
+  No.Contact = model_list$No.Contact$univariate,
+  No.Inv = model_list$No.Inv$disp
+)
+
+#Store nulls too
+null_models <- lapply(names(best_models), function(name) model_list[[name]]$null)
+names(null_models) <- names(best_models)
+
+
+#Step 5. Put their information in a table
+summarize_models <- function(model_list, null_models, predictor_base = "urbanization") {
+  
+  summary_table <- lapply(names(model_list), function(outcome) {
+    model <- model_list[[outcome]]
+    null_model <- null_models[[outcome]]
+    
+    fixed_coefs <- tidy(model, effects = "fixed", conf.int = TRUE) #extract fixef
+    
+    term_row <- fixed_coefs %>% filter(grepl(predictor_base, term)) #id predictor
+    
+    if (nrow(term_row) == 0) {
+      warning(paste("Predictor term not found in mean model for", outcome))
+      beta <- ci_low <- ci_high <- rr <- rr_low <- rr_high <- beta_p <- NA
+      beta_term <- NA
+    } else {
+      beta_term <- term_row$term[1]
+      beta <- term_row$estimate[1]
+      ci_low <- term_row$conf.low[1]
+      ci_high <- term_row$conf.high[1]
+      beta_p <- term_row$p.value[1]
+      rr <- exp(beta)
+      rr_low <- exp(ci_low)
+      rr_high <- exp(ci_high)
+    }
+    
+    lrt <- tryCatch({ #LR test. I dont know what the trycatch is doing here...
+      anova(null_model, model, test = "Chisq")
+    }, error = function(e) {
+      warning(paste("LRT failed for", outcome))
+      return(NULL)
+    })
+    
+    lrt_p <- if (!is.null(lrt)) lrt$`Pr(>Chisq)`[2] else NA
+    
+    disp_coefs <- tryCatch({ #extract disp formula... seems broken
+      tidy(model, effects = "disp", conf.int = TRUE)
+    }, error = function(e) NULL)
+    
+    disp_row <- if (!is.null(disp_coefs)) disp_coefs %>% filter(grepl(predictor_base, term)) else NULL
+    
+    if (!is.null(disp_row) && nrow(disp_row) > 0) {
+      disp_term <- disp_row$term[1]
+      disp_beta <- disp_row$estimate[1]
+      disp_ci_low <- disp_row$conf.low[1]
+      disp_ci_high <- disp_row$conf.high[1]
+    } else {
+      disp_term <- disp_beta <- disp_ci_low <- disp_ci_high <- NA
+    }
+    
+    data.frame(
+      outcome = outcome,
+      beta_term = beta_term,
+      beta = beta,
+      beta_p = beta_p,
+      ci_lower = ci_low,
+      ci_upper = ci_high,
+      rate_ratio = rr,
+      rr_ci_lower = rr_low,
+      rr_ci_upper = rr_high,
+      AIC = AIC(model),
+      LRT_p = lrt_p,
+      disp_term = disp_term,
+      disp_beta = disp_beta,
+      disp_ci_lower = disp_ci_low,
+      disp_ci_upper = disp_ci_high
+    )
+  }) %>% bind_rows()
+  
+  return(summary_table)
+}
+
+#Apply to my data (best models)
+summary <- summarize_models(best_models, null_models)
+
+summary
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+summary(model_list$No.Contact$univariate)
+
+
+
 M_Contact <- glmmTMB(No.Contact ~ urbanization + offset(log(TotalEvents)), 
                      family = "nbinom2", 
                      #dispformula = ~urbanization,
@@ -49,6 +503,12 @@ M_Solve <- glmmTMB(Solves ~ urbanization + offset(TotalEvents),
                   family = "poisson", 
                   #dispformula = ~urbanization,
                   data = sitedata)
+
+
+
+
+
+
 #No model possible
 
 

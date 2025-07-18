@@ -27,8 +27,6 @@ groundhog.library(libs, groundhog.day)
 #  Create full extent model guide ------------------------------------
 dat <- fread("data/EventDataJul2025.csv")
 
-unique(dat$Orient)
-
 guide <- CJ(response = c("Contact_duration", "Inv_duration", "Behav_Complexity", "Lope", "Solves"),
             var = c("urbanization", "PuzzleType", "Year", "Light", "GroupSize_scaled",
                     "Sex", "temp_scaled", "SiteSequence_scaled", "Disease"),
@@ -68,24 +66,86 @@ guide[, extent := "city_and_park"]
 # >>> Create within-city model guide -----------------------------------------
 
 city_guide <- copy(guide)
+
+#Extract rows that I need to replace 'urbanization' (i.e., rows where var = urbanization)
+rows <- city_guide[var == "urbanization"]
+
+# Modify original rows to road density
 city_guide[var == "urbanization", var := "urbanization_score_scaled"]
 
-city_guide[, urbanization_formula := gsub("urbanization", 
-                                          "urbanization_score_scaled",
-                                          urbanization_formula)]
+# Duplicate rows for other urbanization metrics
+rows_pop_density <- copy(rows)[, var := "pop_density_scaled"]
+rows_Road.density <- copy(rows)[, var := "Road.density_scaled"]
+rows_ANTH <- copy(rows)[, var := "ANTH_scaled"]
+rows_NAT <- copy(rows)[, var := "NAT_scaled"]
+rows_Nat50 <- copy(rows)[, var := "Nat50_scaled"]
+rows_Nat100 <- copy(rows)[, var := "Nat100_scaled"]
+rows_Nat250 <- copy(rows)[, var := "Nat250_scaled"]
 
-city_guide[, univariate_formula := gsub("urbanization", 
-                                          "urbanization_score_scaled",
-                                        univariate_formula)]
+# Slurp them together
+city_guide <- rbind(city_guide,
+                    rows_pop_density,
+                    rows_Road.density,
+                    rows_ANTH,
+                    rows_NAT,
+                    rows_Nat50,
+                    rows_Nat100,
+                    rows_Nat250)
+
+
+#I need to go into the UNIVARIATE formula column and replace 'urbanization' with whatever is in var
+city_guide[grepl("urbanization", univariate_formula),
+      univariate_formula := gsub("urbanization", var, univariate_formula),
+      by = .I]
+
+#So, that fixed the univariate column. Now I need to do the same with the urbanization column
+#I need to substitute 'urbanization' with what would have been urbanization_score
+#But now it's 7 different things. what was i thinking???
+
+#Janky, but this should work
+# ID rows that contain 'urbanization' in the urb formula column
+rows <- guide[grepl("urbanization", urbanization_formula)]
+
+# Replace 'urbanization' with 'urbanization_score_scaled' in-place
+city_guide[grepl("urbanization", urbanization_formula), 
+      urbanization_formula := gsub("urbanization", "urbanization_score_scaled", urbanization_formula)]
+
+#Create duplicates with other 7 variables
+replacements <- c("pop_density_scaled", "Road.density_scaled", "ANTH_scaled", "NAT_scaled",
+                  "Nat50_scaled", "Nat100_scaled", "Nat250_scaled")
+
+
+# Make list of modified data.tables
+duplicates <- lapply(replacements, function(letter) {
+  copy(rows)[, urbanization_formula := gsub("urbanization", letter, urbanization_formula)]
+})
+
+# Step 4: Bind them all back together
+city_guide <- rbind(city_guide, rbindlist(duplicates))
+
+
+#city_guide[, urbanization_formula := gsub("urbanization", 
+ #                                         "urbanization_score_scaled",
+  #                                        urbanization_formula)]
+
+#city_guide[, univariate_formula := gsub("urbanization", 
+ #                                         "urbanization_score_scaled",
+  #                                      univariate_formula)]
+
+
+
+
 # city_guide[, var := ]
 city_guide[grepl("urbanization", univariate_formula), ]
 
-city_guide[, extent := "city"]
+city_guide[, extent := "city"] #extent for this should be city only
 
+#Reunite
 guide <- rbind(guide,
                city_guide)
 
 guide
+
 
 # >>> Specify model family -----------------------------------------
 #' *From 0_data_exploration.R script:*
@@ -117,12 +177,37 @@ guide[, model_complexity_comparison_ID := paste0("model_complexity_id_",
 guide[model_complexity_comparison_ID == "model_complexity_id_96"]
 
 # >>> Add an exclusion formula to make sure models are comparable --------------------------------------------------
-guide[, exclusion := paste0("complete.cases(", 
-                            response, ", ", 
-                            gsub("_scaled", "", var), ", ", 
-                            ifelse(extent == "city", "urbanization_score", "urbanization"),
-                            ifelse(subject_id == "yes", ", Subject", ""),
-                            ")")]
+#I AM WORRIED I DID THIS WRONG AND IT IS FUCKING EVERYTHING UP
+#the goal here is to make a column that IDs the models that should be compared
+#this is logical--one null + one univariate + one urbanization model
+#the location scale part is something I don't know how to do. 
+#I think I could get this just by kind of pasting the resp var + pred + 
+
+#I am breaking this into multiple steps because JANK
+# Make a new column that pulls urbanization variable name from urbanization_formula column
+guide[, urb_var := sub(".*\\+\\s*([^_\\s]+)(?:_scaled)?", "\\1", urbanization_formula)]
+#success 
+
+#create exclusion string?? I hope!!!
+guide[, exclusion := paste0(
+  "complete.cases(",
+  response, ", ",
+  gsub("_scaled", "", var), ", ",
+  urb_var,
+  ifelse(subject_id == "yes", ", Subject", ""),
+  ")"
+)]
+
+
+#This is Erick's old code... THAT GUY
+# >>> Add an exclusion formula to make sure models are comparable --------------------------------------------------
+#guide[, exclusion := paste0("complete.cases(", 
+ #                           response, ", ", 
+  #                          gsub("_scaled", "", var), ", ", 
+   #                         ifelse(extent == "city", "urbanization_score", "urbanization"),
+    #                        ifelse(subject_id == "yes", ", Subject", ""),
+     #                       ")")]
+
 
 guide[sensitivity_analysis == "orients", exclusion := paste(exclusion, "& Orient == 'Y'")]
 unique(guide$exclusion)
