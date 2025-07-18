@@ -21,184 +21,82 @@ groundhog.library(libs, groundhog.day)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -------------------------------------
 # 0. Load data and guide --------------------------------------------------
 
-guide <- readRDS("builds/batch_models_july_2025/model_guide_with_comparison_stats.Rds")
+master_guide <- readRDS("builds/batch_models_july_2025/model_guide_with_comparison_stats.Rds")
 
 dat <- readRDS("builds/prepared_dataset.Rds")
-#' [Urbanization score may need to be rethought.]
-#' [Since it sucks so much I'm goign to exclude for now:]
-guide <- guide[extent != "city", ]
+dat
 
-#' [adding dispformula didn't improve model quality for urbanization hypotheses.]
-#' [For simplicity, going to drop all locaiton_scale models. No citation for Lundy :( ]
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --------------------------------------
+# 1. Let's look at your explicit hypotheses about urbanization -----------------------------------------------------------
+master_guide
 
-guide <- guide[location_or_scale == "location", ]
-
-unique(guide$location_or_scale)
-unique(guide$dispformula)
-
-# Check ratios...that's pretty good
-dat[, .(n = .N), by = .(urbanization, Sex)]
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -------------------------------------
-# 1. Report urbanization hypothesis testing -------------------------------
-sub_guide <- guide[var %in% c("urbanization", "urbanization_score_scaled") &
-                     model_type == "univariate"]
+sub_guide <- master_guide[var %in% c("urbanization",
+                        "urbanization_score_scaled",
+                        "pop_density_scaled",
+                        "Road.density_scaled", "ANTH_scaled", "NAT_scaled",
+                        "Nat50_scaled", "Nat100_scaled", "Nat250_scaled") &
+               !is.na(null_uni_chisq), !c("formula_urbanization", "urbanization_var", 
+                                          "uni_urban_chisq", "uni_urban_p")]
 sub_guide
 
-# >>> Compare to nulls (Orients = "Y")-----------------------------
-sub_guide[sensitivity_analysis == "orients" &
-            subject_id == "no"]
-sub_guide[sensitivity_analysis == "orients" & 
-            univariate_improved_quality_over_null == "yes" &
-            subject_id == "no"]
-#' *4 of 5 are improved by urbanization as a univariate factor*
+sub_guide[, sig := ifelse(null_uni_p < 0.05, "yes", "no")]
 
-
-sub_guide[sensitivity_analysis == "orients" &
-            subject_id == "yes"]
-sub_guide[sensitivity_analysis == "orients" & 
-            univariate_improved_quality_over_null == "yes" &
-            subject_id == "yes"]
-#' *4 of 5 are improved by urbanization as a univariate factor*
-
-# >>> See if results with all data --------------------------
+# >>> All data & no subject ID -----------------------------------------------------------
+setorder(sub_guide, extent, response, var)
 sub_guide[sensitivity_analysis == "all_data" &
-            subject_id == "yes" ]
-unique(sub_guide$sensitivity_analysis)
-sub_guide[sensitivity_analysis == "all_data" & 
-            univariate_improved_quality_over_null == "yes"  &
-            subject_id == "yes"]
-#' *3 of 5 are improved by urbanization as a univariate factor*
+            subject_id == "no", .(response, var, extent, sig)]
 
-
+# >>> All data & subject ID -----------------------------------------------------------
+setorder(sub_guide, extent, response, var)
 sub_guide[sensitivity_analysis == "all_data" &
-            subject_id == "no" ]
-unique(sub_guide$sensitivity_analysis)
-sub_guide[sensitivity_analysis == "all_data" & 
-            univariate_improved_quality_over_null == "yes"  &
-            subject_id == "no"]
-#' *4 of 5 are improved by urbanization as a univariate factor*
+            subject_id == "yes", .(response, var, extent, sig)]
+
+
+# >>> orients & no subject ID -----------------------------------------------------------
+
+sub_guide[sensitivity_analysis == "orients" &
+            subject_id == "no", .(response, var, extent, sig)]
+
+# >>> orients & subject ID -----------------------------------------------------------
+
+sub_guide[sensitivity_analysis == "orients" &
+            subject_id == "yes", .(response, var, extent, sig)]
+
+#' [Results seem pretty robust.]
+#' *but the problem with this entire approach is interpreting so many fucking models.*
+#' *what have we done my buddy*
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -------------------------------------
-# 2. Select univariates that improved model quality -----------------------
-null_vs_uni <- guide[!var %in% c("urbanization", "urbanization_score_scaled") &
-                     model_type == "univariate"]
-null_vs_uni
+# 2. Categorize extrinsic/intrinsic covariates + urbanization -------------
+uni_urban_guide <- master_guide[!var %in% c("urbanization",
+                                     "urbanization_score_scaled",
+                                     "pop_density_scaled",
+                                     "Road.density_scaled", "ANTH_scaled", "NAT_scaled",
+                                     "Nat50_scaled", "Nat100_scaled", "Nat250_scaled") &
+                            !is.na(null_uni_chisq), ]
+
+uni_urban_guide[, uni_sig := ifelse(null_uni_p < 0.05, "yes", "no")]
+
+uni_urban_guide[, urban_sig := ifelse(uni_urban_p < 0.05, "yes", "no")]
+
+uni_urban_guide[, comp_conclusion := fcase(uni_sig == "yes" & urban_sig == "yes", "uni_sig_urban_sig",
+                                           uni_sig == "no" , "uni_NOT_sig",
+                                           uni_sig == "yes" & urban_sig == "no", "uni_sig_urban_NOT_sig")]
+uni_urban_guide[is.na(comp_conclusion), ]
 
 
-# >>> Compare to nulls (Orients = "Y")-----------------------------
-null_vs_uni[sensitivity_analysis == "orients"&
-            subject_id == "no" ]
-unique(null_vs_uni[sensitivity_analysis == "orients" & 
-                   univariate_improved_quality_over_null == "yes" &
-                   subject_id == "no",
-                 .(var, response)])
+setorder(uni_urban_guide, extent, comp_conclusion, subject_id, sensitivity_analysis)
 
+uni_urban_guide[comp_conclusion != "uni_NOT_sig", 
+                .(n = .N,
+                  null_uni_chisq = paste(round(range(null_uni_chisq), 2), collapse = ", "),
+                  uni_urban_chisq = paste(round(range(uni_urban_chisq), 2), collapse = ", "),
+                  
+                  null_uni_p = paste(round(range(null_uni_p), 8), collapse = ", "),
+                  uni_urban_p = paste(round(range(uni_urban_p), 8), collapse = ", ")),
+                by = .(comp_conclusion,extent, sensitivity_analysis, subject_id)]
 
-null_vs_uni[sensitivity_analysis == "orients"&
-            subject_id == "yes" ]
-unique(null_vs_uni[sensitivity_analysis == "orients" & 
-                   univariate_improved_quality_over_null == "yes" &
-                   subject_id == "yes",
-                 .(var, response)])
+#' [OK, so urbanization almost always improves model quality in city_and_park]
+#' [but is not as influential when in the city.]
 
-
-# >>> See if results with all data --------------------------
-null_vs_uni[sensitivity_analysis == "all_data" ]
-unique(null_vs_uni$sensitivity_analysis)
-null_vs_uni[sensitivity_analysis == "all_data" & univariate_improved_quality_over_null == "yes"]
-
-#' [I'll leave it to you when writing these up but can summarize as follows:]
-#' 
-null_vs_uni[ univariate_improved_quality_over_null == "yes", 
-                      .(min_chisq = min(null_uni_chisq),
-                        max_chisq = max(null_uni_chisq),
-                        min_p = min(null_uni_p),
-                        max_p = max(null_uni_p)),
-                    by = .(univariate_improved_quality_over_null,
-                           sensitivity_analysis, subject_id,
-                           response)]
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -------------------------------------
-# 3. Test if urbanization was still important with those univariat --------
-uni_vs_urbanization <- sub_guide[univariate_improved_quality_over_null == "yes", ]
-#' [Filter to just intrinsic/extrinsic factors that improved models]
-
-uni_vs_urbanization[sensitivity_analysis == "all_data" & 
-            subject_id == "no" &
-            urbanization_improved_univariate == "yes", ] 
-
-uni_vs_urbanization[sensitivity_analysis == "all_data" & 
-            subject_id == "no", ]
-#' *12 of 13 sig extrinsic/intrinsic variables are improved by adding urbanization*
-
-uni_vs_urbanization[sensitivity_analysis == "all_data" & 
-            subject_id == "yes" &
-            urbanization_improved_univariate == "yes", ] 
-
-uni_vs_urbanization[sensitivity_analysis == "all_data" & 
-            subject_id == "yes", ]
-#' *5 of 5 sig extrinsic/intrinsic variables are improved by adding urbanization*
-
-
-# ORIENTS == "YES"
-uni_vs_urbanization[sensitivity_analysis == "orients" & 
-            subject_id == "no" &
-            urbanization_improved_univariate == "yes", ] 
-
-uni_vs_urbanization[sensitivity_analysis == "orients" & 
-            subject_id == "no" , ]
-#' *9 of 10 sig extrinsic/intrinsic variables are improved by adding urbanization*
-
-uni_vs_urbanization[sensitivity_analysis == "orients" & 
-            subject_id == "yes" &
-            urbanization_improved_univariate == "yes", ] 
-
-uni_vs_urbanization[sensitivity_analysis == "orients" & 
-            subject_id == "yes" , ]
-#' *4 of 4 sig extrinsic/intrinsic variables are improved by adding urbanization*
-
-
-#' [I'll leave it to you when writing these up but can summarize as follows:]
-#' 
-uni_vs_urbanization[, .(min_chisq = min(urbanization_univariate_chisq),
-                        max_chisq = max(urbanization_univariate_chisq),
-                        min_p = min(urbanization_univariate_p),
-                        max_p = max(urbanization_univariate_p)),
-                    by = .(urbanization_improved_univariate,
-                           sensitivity_analysis, subject_id,
-                           response)]
-
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -------------------------------------
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -------------------------------------
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -------------------------------------
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -------------------------------------
-
-
-# DEPRECATED FOR REFERENCE ------------------------------------------------
-
-
-# 3. Create tidy model summary table --------------------------------------
-
-m <- readRDS(master_guide$model_path[1])
-m
-tidy(m)
-
-confint(m) %>% tidy() %>% rename()
-
-tidy_models <- function(m){
-  
-  m.tidy <- tidy(m)
-  
-  #' [Add R2 etc.]
-  return(m.tidy)
-  
-}
-
-ms.tidy <- lapply(master_guide$model_path,
-                  readRDS)
-ms.tidy <- lapply(ms.tidy,
-                  tidy_models)
 

@@ -70,6 +70,7 @@ if(rerun_all){
 }
 
 # >>> Sequential version --------------------------------------------------
+
 guide
 
 m <- c()
@@ -78,65 +79,95 @@ i <- 1
 #' *Note that some models won't run because there is insufficient N for their random effects*
 working_guide <- guide[!file.exists(model_path), ]
 
-# >>> Sequential version ---------------------------------------------------
 warnings <- list()
 sub_dat <- c()
 
+#' [Make sure to have all variables scaled inside loop:]
+#' [We could be more clever and only scale the variables that are in the formula...But it's a pain in the butt]
+unique(guide[grepl("scaled", var)]$var)
+unique(guide[grepl("scaled", var)]$urbanization_var)
+
+#' [the first time I run this I commented out the tryCatch business so we can see what errors are being thrown]
+
 for(i in 1:nrow(working_guide)){
-  
   tryCatch(
     expr={
       
       sub_dat <- dat[eval(parse(text = working_guide[i, ]$exclusion))]
+      #' [Need to score the new variables too...]
       sub_dat[, `:=` (urbanization_score_scaled = scale(urbanization_score),
                       GroupSize_scaled = scale(GroupSize),
                       temp_scaled = scale(temp),
-                      SiteSequence_scaled = scale(SiteSequence))]
+                      SiteSequence_scaled = scale(SiteSequence),
+                      ANTH_scaled = scale(ANTH),
+                      NAT_scaled = scale(NAT),
+                      Nat100_scaled = scale(Nat100),
+                      Nat250_scaled = scale(Nat250),
+                      Nat50_scaled = scale(Nat50),
+                      Road.density_scaled = scale(Road.density),
+                      pop_density_scaled = scale(pop_density))]
       # setdiff(working_guide$var, names(sub_dat))
       m <- eval(parse(text = working_guide[i, ]$model_call))
-      saveRDS(m, working_guide[i, ]$model_path)
+      
+      if(!is.null(m)) saveRDS(m, working_guide[i, ]$model_path)
+      
+      m <- NULL # just in case...
       
     },
     error=function(e){
-      warnings[[i]] <- data.table(model_id = working_guide[i, ]$model_id,
+      warnings[[i]] <<- data.table(model_id = working_guide[i, ]$model_id,
                                   error = e)
       cat(red("error at"), i, "\r")
     },
     warning=function(w){ #' *there were some convergence warnings...spooky*
-      # Let's store them...And well I guess drop those models? 
-      warnings[[i]] <- data.table(model_id = working_guide[i, ]$model_id,
+      # Let's store them...And well I guess drop those models?
+      warnings[[i]] <<- data.table(model_id = working_guide[i, ]$model_id,
                                   warning = w)
+      cat(blue(i))
     }
+
   )
-  
+
   cat(blue(i), magenta("/"), red(nrow(working_guide)), "\r")
 }
 
-warnings
+names(warnings) <- guide$model_id
+# Hmmm.
+
 
 working_guide <- guide[!file.exists(model_path), ]
-working_guide #about 700 didjn't run...
-#' [Somehow this increased from 2 to 19 when I fixed a couple errors in the dispformula...But then I made Year a factor and it went down to 2]
+nrow(working_guide) # these are the models that didn't run
 
 # >>> Test the models that didn't run -------------------------------------
 working_guide[1, ]$model_call
 
+sub_dat <- dat[eval(parse(text = working_guide[1, ]$exclusion))]
 eval(parse(text = working_guide[1, ]$model_call))
+
+sub_dat <- dat[eval(parse(text = working_guide[2, ]$exclusion))]
 eval(parse(text = working_guide[2, ]$model_call))
 
-unique(working_guide$var)
-unique(working_guide$response)
 
-dat[complete.cases(Contact_duration, urbanization_score, SiteID)]
-unique(dat[complete.cases(Contact_duration, urbanization_score, SiteID)]$SiteID)
+# >>> Screen model objects that didn't converge ---------------------------
+#' [didn't do this before...but should have ]
+m$pdHess
 
-hist(dat[complete.cases(Contact_duration, urbanization_score, SiteID)]$Contact_duration)
+m <- readRDS(guide[1, ]$model_path)
+m$sdr$pdHess
 
-plot(dat[complete.cases(Contact_duration, urbanization_score, SiteID)]$Contact_duration ~ dat[complete.cases(Contact_duration, urbanization_score, SiteID)]$urbanization_score)
+guide <- guide[file.exists(model_path), ]
 
-# Well small loss I reckon.
-# :)
+for(i in 1:nrow(guide)){
+  m <- readRDS(guide[i, ]$model_path)
+  
+  guide[i, model_converged := m$sdr$pdHess]
+  cat(i, "/", nrow(guide), "\r")
+}
 
+#' *should have done this in the loop above...Next time...*
+guide[model_converged == FALSE, ]
+
+# Well that's good news. I hope it's real hahaha
 
 # >>> Parallel version ---------------------------------------------------
 # Having a weird problem I've never had before: not finding objects in global environment...
