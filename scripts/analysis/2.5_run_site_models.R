@@ -7,6 +7,9 @@ library(data.table)
 library(DHARMa)
 library(dplyr)
 library(broom.mixed)
+library(sjPlot)
+library(egg)
+library(performance)
 
 # Load data --------------------------------------------------------------
 
@@ -57,7 +60,7 @@ build_models <- function(data, outcomes, predictor, offset_var, dispformula, fam
 #Apply to my data
 model_list <- build_models(
   data = sitedata,
-  outcomes = c("Solves", "No.Lope", "No.Contact", "No.Inv"),
+  outcomes = c("Solves", "No.Lope", "No.Contact", "No.Inv", "No.Behav"),
   predictor = "urbanization",
   offset_var = "offset",
   dispformula = ~urbanization,
@@ -116,7 +119,8 @@ best_models <- list(
   Solves = model_list$Solves$univariate,
   No.Lope = model_list$No.Lope$univariate,
   No.Contact = model_list$No.Contact$univariate,
-  No.Inv = model_list$No.Inv$disp
+  No.Inv = model_list$No.Inv$univariate,
+  No.Behav = model_list$No.Behav$univariate
 )
 
 #Store nulls too
@@ -201,8 +205,12 @@ summary <- summarize_models(best_models, null_models)
 
 summary
 
-
-
+#It's only 5 models, so just save them manually
+SolveCP <- model_list$Solves$univariate
+LopeCP <- model_list$No.Lope$univariate
+ContactCP <- model_list$No.Contact$univariate
+InvCP <- model_list$No.Inv$univariate
+BehavCP <- model_list$No.Behav$univariate
 
 #Repeat for urbanization score, which is now actually something else
 #Filter to city sites only
@@ -251,8 +259,8 @@ build_models2 <- function(data, outcomes, predictors, offset_var, family = nbino
 #Apply to my data
 model_list <- build_models2(
   data = citysites,
-  outcomes = c("Solves", "No.Lope", "No.Contact", "No.Inv"),
-  predictors = c("Road.density", "pop_density", "ANTH", "NAT", "Nat50", "Nat100", "Nat250"),
+  outcomes = c("Solves", "No.Lope", "No.Contact", "No.Inv", "No.Behav"),
+  predictors = c("Road.density", "pop_density", "ANTH", "NAT", "Nat50", "Nat100", "Nat250", "urbanization_score"),
   offset_var = "offset",
   family = nbinom2()
 ) 
@@ -261,28 +269,6 @@ model_list <- build_models2(
 fixef(model_list$Solves$pop_density$null)
 fixef(model_list$Solves$pop_density$univariate)
 fixef(model_list$Solves$pop_density$disp)
-
-fixef(model_list$No.Lope$pop_density$null)
-fixef(model_list$No.Lope$pop_density$univariate)
-fixef(model_list$No.Lope$pop_density$disp)
-
-fixef(model_list$No.Lope$Road.density$null)
-fixef(model_list$No.Lope$Road.density$univariate)
-fixef(model_list$No.Lope$Road.density$disp)
-
-fixef(model_list$No.Inv$ANTH$null)
-fixef(model_list$No.Inv$ANTH$univariate)
-fixef(model_list$No.Inv$ANTH$disp)
-
-fixef(model_list$No.Inv$NAT$null)
-fixef(model_list$No.Inv$NAT$univariate)
-fixef(model_list$No.Inv$NAT$disp)
-
-fixef(model_list$No.Inv$Nat50$null)
-fixef(model_list$No.Inv$Nat50$univariate)
-fixef(model_list$No.Inv$Nat50$disp)
-
-
 
 #Step 2. Determine whether models perform better than null
 #Build function to compare
@@ -336,13 +322,21 @@ Uni.v.Disp.lrt <- function(model_list) {
   lrt_results <- list()
   
   for (outcome in names(model_list)) {
-    uni_mod <- model_list[[outcome]]$univariate
-    disp_mod <- model_list[[outcome]]$disp
-    
-    
-    lrt <- anova(uni_mod, disp_mod, test = "Chisq")
-    
-    lrt_results[[outcome]] <- lrt
+    for (predictor in names(model_list[[outcome]])) {
+      models <- model_list[[outcome]][[predictor]]
+      
+      # Proceed only if both models exist
+      if (!is.null(models$univariate) && !is.null(models$disp)) {
+        lrt <- tryCatch({
+          anova(models$univariate, models$disp, test = "Chisq")
+        }, error = function(e) {
+          warning(paste("LRT failed for", outcome, "-", predictor, ":", e$message))
+          return(NULL)
+        })
+        
+        lrt_results[[paste(outcome, predictor, sep = "_")]] <- lrt
+      }
+    }
   }
   
   return(lrt_results)
@@ -350,28 +344,30 @@ Uni.v.Disp.lrt <- function(model_list) {
 
 #Apply to my data
 lrt_results <- Uni.v.Disp.lrt(model_list)
-#This improved model results for Investigate only
+lrt_results #that did not help matters
 
+#This didn't improve any of the models that I want to hang on to
 
 #Step 4. Store your best models
-best_models <- list(
-  Solves = model_list$Solves$univariate,
-  No.Lope = model_list$No.Lope$univariate,
-  No.Contact = model_list$No.Contact$univariate,
-  No.Inv = model_list$No.Inv$disp
+best_models2 <- list(
+  Solves = model_list$Solves$urbanization_score$univariate,
+  No.Lope = model_list$No.Lope$urbanization_score$univariate,
+  No.Contact = model_list$No.Contact$urbanization_score$univariate,
+  No.Inv = model_list$No.Inv$urbanization_score$univariate,
+  No.Behav = model_list$No.Behav$urbanization_score$univariate
 )
 
 #Store nulls too
-null_models <- lapply(names(best_models), function(name) model_list[[name]]$null)
-names(null_models) <- names(best_models)
+null_models2 <- lapply(names(best_models2), function(name) model_list[[name]]$null)
+names(null_models2) <- names(best_models2)
 
 
 #Step 5. Put their information in a table
-summarize_models <- function(model_list, null_models, predictor_base = "urbanization") {
+summarize_models <- function(model_list, null_models2, predictor_base = "urbanization_score") {
   
   summary_table <- lapply(names(model_list), function(outcome) {
     model <- model_list[[outcome]]
-    null_model <- null_models[[outcome]]
+    null_model <- null_models2[[outcome]]
     
     fixed_coefs <- tidy(model, effects = "fixed", conf.int = TRUE) #extract fixef
     
@@ -439,9 +435,185 @@ summarize_models <- function(model_list, null_models, predictor_base = "urbaniza
 }
 
 #Apply to my data (best models)
-summary <- summarize_models(best_models, null_models)
+summary2 <- summarize_models(best_models2, null_models2)
 
-summary
+summary2
+
+FullSiteSumamry <-rbind(summary, summary2)
+
+#write.csv(FullSiteSumamry, "figures/SiteModelInfo.csv")
+
+#Again, save the 5 relevant models for plotting
+SolveCity <- model_list$Solves$urbanization_score$univariate
+LopeCity <- model_list$No.Lope$urbanization_score$univariate
+ContactCity <- model_list$No.Contact$urbanization_score$univariate
+InvCity <- model_list$No.Inv$urbanization_score$univariate
+BehavCity <- model_list$No.Behav$urbanization_score$univariate
+
+#Create Plots for City vs. Park
+#City vs Park Plots------------------------------------------------------------------
+
+#Make model prediction plots for city vs. park-----------------------------
+#
+models_categorical <- list(
+  InvCP = InvCP,
+  LopeCP = LopeCP,
+  ContactCP = ContactCP,
+  SolveCP = SolveCP,
+  BehavCP = BehavCP
+)
+
+# Function to extract predictions
+predict_urban_levels <- function(model, model_name) {
+  newdat <- data.table(urbanization = c("Wild", "City"))
+  
+  # Calculate log-mean of offset variable
+  newdat[, offset := log(mean(sitedata$offset))]
+  
+  preds <- predict(model, newdata = newdat, type = "response", se.fit = TRUE)
+  
+  newdat[, predicted := preds$fit]
+  newdat[, lower := predicted - 1.96 * preds$se.fit]
+  newdat[, upper := predicted + 1.96 * preds$se.fit]
+  newdat[, response := model_name]
+  
+  return(newdat)
+}
+
+# Apply to all models
+predicted_all <- rbindlist(
+  Map(predict_urban_levels, models_categorical, names(models_categorical))
+)
+
+head(predicted_all)
+
+
+#These plots will show a model's predocted count for a typical observation with specified urb level :
+#Also average offset and any other predictors held constant, which doesn't apply here
+label_map <- c(
+  "InvCP"     = "Number of Investigations",
+  "ContactCP" = "Number of Contacts",
+  "BehavCP" = "Number of Behaviours",
+  "LopeCP"    = "Number of Escape Gaits",
+  "SolveCP"   = "Number of Solves"
+)
+
+# Apply new labels
+predicted_all[, response_label := label_map[response]]
+predicted_all[, response_label := factor(response_label, levels = label_map)]
+predicted_all[, urbanization := factor(urbanization, levels = c("Wild", "City"))]
+
+
+# Plot
+CvPPlots <- ggplot(predicted_all, aes(x = urbanization, y = predicted, fill = urbanization)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+#  geom_hline(yintercept = 0, color = "black") +
+  facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
+  scale_fill_manual(values = c("Wild" = "#56B4E9", "City" = "#0072B2")) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Predicted Count"
+  ) +
+  theme(axis.text.x = element_text(colour = "black", face = "plain", size = 12),
+        axis.text.y = element_text(colour = "black", face = "plain", size = 12),
+        axis.title.x = element_text(colour = "black", face = "plain", size = 12),
+        axis.title.y = element_text(colour = "black", face = "plain", size = 12),
+        legend.text = element_text(colour = "black", face = "plain", size = 12),
+        legend.title = element_blank(),
+        legend.position = "none")
+
+CvPPlots
+
+#City only plots---------------------------------------------------------------
+#Store models
+models_continuous <- list(
+  InvCity = InvCity,
+  ContactCity = ContactCity,
+  BehavCity = BehavCity,
+  LopeCity = LopeCity,
+  SolveCity = SolveCity
+)
+
+#Make function to generate model predioctions
+predict_continuous_model <- function(model, model_name) {
+  score_seq <- seq(-3.2, 2.2, length.out = 100) 
+  
+  newdat <- data.table(urbanization_score = score_seq)
+  
+  newdat[, offset := log(mean(citysites$offset))]
+  
+  preds <- predict(model, newdata = newdat, type = "response", se.fit = TRUE)
+  
+  newdat[, predicted := preds$fit]
+  newdat[, lower := predicted - 1.96 * preds$se.fit]
+  newdat[, upper := predicted + 1.96 * preds$se.fit]
+  newdat[, response := model_name]
+  
+  return(newdat)
+}
+
+
+#Apply to my mods
+predicted_cont <- rbindlist(
+  Map(predict_continuous_model, models_continuous, names(models_continuous))
+)
+
+#Specify desired order and names
+label_map_cont <- c(
+  "InvCity"     = "Number of Investigations",
+  "ContactCity" = "Number of Contacts",
+  "BehavCity" = "Number of Behaviours",
+  "LopeCity"    = "Number of Escape Gaits",
+  "SolveCity"   = "Number of Solves"
+)
+
+# Add new labels
+predicted_cont[, response_label := label_map_cont[response]]
+predicted_cont[, response_label := factor(response_label, levels = label_map_cont)]
+
+#Plot!!!
+CityPlots <- ggplot(predicted_cont, aes(x = urbanization_score, y = predicted)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#56B4E9", alpha = 0.2) +
+  geom_line(color = "#0072B2", size = 1) +
+#  geom_hline(yintercept = 0, color = "black") +
+  facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    axis.text = element_text(colour = "black", size = 12),
+    axis.title = element_text(colour = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Score",
+    y = "Predicted Count"
+  ) +
+  theme(axis.text.x = element_text(colour = "black", face = "plain", size = 12),
+        axis.text.y = element_text(colour = "black", face = "plain", size = 12),
+        axis.title.x = element_text(colour = "black", face = "plain", size = 12),
+        axis.title.y = element_text(colour = "black", face = "plain", size = 12),
+        legend.text = element_text(colour = "black", face = "plain", size = 12),
+        legend.title = element_blank(),
+        legend.position = "none")
+
+
+#Combine plots
+SitePlots <- ggarrange(CvPPlots, CityPlots, ncol = 2)
+#ggsave("figures/SitePlots.png", SitePlots, width = 6, height = 7.5, dpi = 700,  bg = "white") 
+
+anova(model_list$No.Inv$urbanization_score$null, model_list$No.Inv$urbanization_score$univariate, type = "chisq")
+anova(model_list$No.Contact$urbanization_score$null, model_list$No.Contact$urbanization_score$univariate, type = "chisq")
+anova(model_list$No.Lope$urbanization_score$null, model_list$No.Lope$urbanization_score$univariate, type = "chisq")
+anova(model_list$Solves$urbanization_score$null, model_list$Solves$urbanization_score$univariate, type = "chisq")
+anova(model_list$No.Behav$urbanization_score$null, model_list$No.Behav$urbanization_score$univariate, type = "chisq")
 
 
 
@@ -466,7 +638,7 @@ summary
 
 
 
-summary(model_list$No.Contact$univariate)
+
 
 
 

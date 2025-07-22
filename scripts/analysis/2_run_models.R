@@ -52,15 +52,18 @@ guide[location_or_scale == "location_scale" & zero_inflation == "yes"]$model_cal
 #' *We wouldn't hypothesize a linear relationship to year would we?*
 dat[, Year := as.factor(Year)]
 unique(dat$Sex)
-dat[, Sex := fcase(Sex == "SM", "M",
-                   Sex == "U", NA,
-                   Sex == "SF", "F")]
+dat$Sex <- ifelse(dat$Sex == "SF", "F", dat$Sex)
+dat$Sex <- ifelse(dat$Sex == "SM", "M", dat$Sex)
+dat$Sex <- ifelse(dat$Sex == "U", NA, dat$Sex)
 
 dat[, n_events_per_individual := .N, by = Subject]
 dat[n_events_per_individual == 1, Subject := NA] # This will omit unknown subjects
 dat
 
 dat$n_events_per_individual <- NULL
+
+#Set wild as reference category
+dat$urbanization <- factor(dat$urbanization, levels = c("Wild", "City"))
 saveRDS(dat, "builds/prepared_dataset.Rds")
 
 # Run models -------------------------------------------------------

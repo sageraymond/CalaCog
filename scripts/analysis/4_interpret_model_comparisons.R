@@ -27,16 +27,29 @@ dat <- readRDS("builds/prepared_dataset.Rds")
 dat
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --------------------------------------
-# 1. Let's look at your explicit hypotheses about urbanization -----------------------------------------------------------
+# 1. Let's look at our explicit hypotheses about urbanization -----------------------------------------------------------
 master_guide
 
+#sub_guide <- master_guide[var %in% c("urbanization",
+ #                       "urbanization_score_scaled",
+  #                      "pop_density_scaled",
+   #                     "Road.density_scaled", "ANTH_scaled", "NAT_scaled",
+    #                    "Nat50_scaled", "Nat100_scaled", "Nat250_scaled") &
+     #          !is.na(null_uni_chisq), !c("formula_urbanization", "urbanization_var", 
+      #                                    "uni_urban_chisq", "uni_urban_p")]
+
+#Goal it to pull out models that (1) assess urbanization
+# (2) animal was oriented
+# (3) no subject
+# (4) don't have anything else going on!!!
 sub_guide <- master_guide[var %in% c("urbanization",
-                        "urbanization_score_scaled",
-                        "pop_density_scaled",
-                        "Road.density_scaled", "ANTH_scaled", "NAT_scaled",
-                        "Nat50_scaled", "Nat100_scaled", "Nat250_scaled") &
-               !is.na(null_uni_chisq), !c("formula_urbanization", "urbanization_var", 
-                                          "uni_urban_chisq", "uni_urban_p")]
+                       "urbanization_score_scaled") &
+                        sensitivity_analysis == "orients" &
+                         subject_id == "no" &
+                         !is.na(null_uni_chisq), !c("formula_urbanization", "urbanization_var", 
+                                    "uni_urban_chisq", "uni_urban_p")]
+
+
 sub_guide
 
 sub_guide[, sig := ifelse(null_uni_p < 0.05, "yes", "no")]
@@ -65,6 +78,9 @@ sub_guide[sensitivity_analysis == "orients" &
 #' [Results seem pretty robust.]
 #' *but the problem with this entire approach is interpreting so many fucking models.*
 #' *what have we done my buddy*
+
+
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -------------------------------------
 # 2. Categorize extrinsic/intrinsic covariates + urbanization -------------

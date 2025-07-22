@@ -829,7 +829,6 @@ FinalData$Nat50 <- ifelse(FinalData$SiteID == "NE5", 687.2926, FinalData$Nat50 )
 FinalData$Nat100 <- ifelse(FinalData$SiteID == "NE5", 1254.457, FinalData$Nat100 )
 FinalData$Nat250 <- ifelse(FinalData$SiteID == "NE5", 4928.224, FinalData$Nat250 )
 
-
 #write.csv(FinalData, file = "EventDataJul2025.csv")
 
 
@@ -870,6 +869,12 @@ Inv_by_Site <- Events %>%
   group_by(SiteID) %>%
   summarise(No.Inv = n())
 
+#Total no. behaviours
+Behav_by_Site <- Events %>%
+  dplyr::filter(Behav_Complexity > 0) %>%
+  group_by(SiteID) %>%
+  summarise(No.Behav = max(Behav_Complexity, na.rm = TRUE))
+
 #Get list of sites
 SiteList <- Events %>% dplyr::select(SiteID, urbanization_score, urbanization)
 SiteList <- unique(SiteList)
@@ -880,8 +885,6 @@ UrbMetrics <- FinalData %>%
 
 UrbMetrics <- unique(UrbMetrics)
 
-#I can't think of a logical way to do this for complexity...
-
 #Join everyone together
 Frames <- list(SiteList,
                TotalEvents,
@@ -889,6 +892,7 @@ Frames <- list(SiteList,
                Lope_by_Site,
                Contact_by_Site,
                Inv_by_Site,
+               Behav_by_Site,
                UrbMetrics)
 
 SummaryData <- reduce(Frames, left_join, by = "SiteID")
@@ -903,6 +907,7 @@ SummaryData$Solves[is.na(SummaryData$Solves)] <- 0
 SummaryData$No.Lope[is.na(SummaryData$No.Lope)] <- 0
 SummaryData$No.Contact[is.na(SummaryData$No.Contact)] <- 0
 SummaryData$No.Inv[is.na(SummaryData$No.Inv)] <- 0
+SummaryData$No.Behav[is.na(SummaryData$No.Behav)] <- 0
 
 #Add a row for SE3 even though you didn't get any data there
 SE3 <- as.data.frame(as.list(rep(0, ncol(SummaryData))))
