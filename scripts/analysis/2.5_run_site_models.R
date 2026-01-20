@@ -310,11 +310,6 @@ lrt_results <- Null.v.Uni.lrt(model_list)
 #The univariate does not always improve model perfomance...
 lrt_results
 #It does under following circs:
-#Solves + Nat50
-#Solves pluys nat 100
-#No.Inv plus nat50
-#No.Inv plus nat100
-
 
 
 #Step 3. Determine whether models perform better with disp formula
@@ -350,20 +345,26 @@ lrt_results #that did not help matters
 
 #Step 4. Store your best models
 best_models2 <- list(
-  Solves = model_list$Solves$urbanization_score$univariate,
-  No.Lope = model_list$No.Lope$urbanization_score$univariate,
-  No.Contact = model_list$No.Contact$urbanization_score$univariate,
-  No.Inv = model_list$No.Inv$urbanization_score$univariate,
-  No.Behav = model_list$No.Behav$urbanization_score$univariate
+  Solves = model_list$Solves$Nat50$univariate,
+  No.Lope = model_list$No.Lope$Nat50$univariate,
+  No.Contact = model_list$No.Contact$Nat50$univariate,
+  No.Inv = model_list$No.Inv$Nat50$univariate,
+  No.Behav = model_list$No.Behav$Nat50$univariate
 )
 
 #Store nulls too
-null_models2 <- lapply(names(best_models2), function(name) model_list[[name]]$null)
-names(null_models2) <- names(best_models2)
+null_models2 <- list(
+  Solves = model_list$Solves$Nat50$null,
+  No.Lope = model_list$No.Lope$Nat50$null,
+  No.Contact = model_list$No.Contact$Nat50$null,
+  No.Inv = model_list$No.Inv$Nat50$null,
+  No.Behav = model_list$No.Behav$Nat50$null
+)
+
 
 
 #Step 5. Put their information in a table
-summarize_models <- function(model_list, null_models2, predictor_base = "urbanization_score") {
+summarize_models <- function(model_list, null_models2, predictor_base = "Nat50") {
   
   summary_table <- lapply(names(model_list), function(outcome) {
     model <- model_list[[outcome]]
@@ -444,11 +445,11 @@ FullSiteSumamry <-rbind(summary, summary2)
 #write.csv(FullSiteSumamry, "figures/SiteModelInfo.csv")
 
 #Again, save the 5 relevant models for plotting
-SolveCity <- model_list$Solves$urbanization_score$univariate
-LopeCity <- model_list$No.Lope$urbanization_score$univariate
-ContactCity <- model_list$No.Contact$urbanization_score$univariate
-InvCity <- model_list$No.Inv$urbanization_score$univariate
-BehavCity <- model_list$No.Behav$urbanization_score$univariate
+SolveCity <- model_list$Solves$Nat50$univariate
+LopeCity <- model_list$No.Lope$Nat50$univariate
+ContactCity <- model_list$No.Contact$Nat50$univariate
+InvCity <- model_list$No.Inv$Nat50$univariate
+BehavCity <- model_list$No.Behav$Nat50$univariate
 
 #Create Plots for City vs. Park
 #City vs Park Plots------------------------------------------------------------------
@@ -491,11 +492,11 @@ head(predicted_all)
 #These plots will show a model's predocted count for a typical observation with specified urb level :
 #Also average offset and any other predictors held constant, which doesn't apply here
 label_map <- c(
-  "InvCP"     = "Number of Investigations",
-  "ContactCP" = "Number of Contacts",
-  "BehavCP" = "Number of Behaviours",
-  "LopeCP"    = "Number of Escape Gaits",
-  "SolveCP"   = "Number of Solves"
+  "InvCP"     = "Number of Events with\nExplorations",
+  "ContactCP" = "Number of Events with\nPersistence > 0",
+  "BehavCP" = "Total Behavioural Diversity",
+  "LopeCP"    = "Number of Events with\nFearfulness",
+  "SolveCP"   = "Number of Solutions"
 )
 
 # Apply new labels
@@ -543,9 +544,9 @@ models_continuous <- list(
 
 #Make function to generate model predioctions
 predict_continuous_model <- function(model, model_name) {
-  score_seq <- seq(-3.2, 2.2, length.out = 100) 
+  score_seq <- seq(0, 100, length.out = 100) 
   
-  newdat <- data.table(urbanization_score = score_seq)
+  newdat <- data.table(Nat50 = score_seq)
   
   newdat[, offset := log(mean(citysites$offset))]
   
@@ -567,11 +568,11 @@ predicted_cont <- rbindlist(
 
 #Specify desired order and names
 label_map_cont <- c(
-  "InvCity"     = "Number of Investigations",
-  "ContactCity" = "Number of Contacts",
-  "BehavCity" = "Number of Behaviours",
-  "LopeCity"    = "Number of Escape Gaits",
-  "SolveCity"   = "Number of Solves"
+  "InvCity"     = "Number of Events with\nExplorations",
+  "ContactCity" = "Number of Events with\nPersistence > 0",
+  "BehavCity" = "Total Behavioural Diversity",
+  "LopeCity"    = "Number of Events with\nFearfulness",
+  "SolveCity"   = "Number of Solutions"
 )
 
 # Add new labels
@@ -579,7 +580,7 @@ predicted_cont[, response_label := label_map_cont[response]]
 predicted_cont[, response_label := factor(response_label, levels = label_map_cont)]
 
 #Plot!!!
-CityPlots <- ggplot(predicted_cont, aes(x = urbanization_score, y = predicted)) +
+CityPlots <- ggplot(predicted_cont, aes(x = Nat50, y = predicted)) +
   geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#56B4E9", alpha = 0.2) +
   geom_line(color = "#0072B2", size = 1) +
 #  geom_hline(yintercept = 0, color = "black") +
@@ -593,7 +594,7 @@ CityPlots <- ggplot(predicted_cont, aes(x = urbanization_score, y = predicted)) 
     legend.position = "none"
   ) +
   labs(
-    x = "Urbanization Score",
+    x = "Urbanization (City Only; %)",
     y = "Predicted Count"
   ) +
   theme(axis.text.x = element_text(colour = "black", face = "plain", size = 12),
@@ -607,15 +608,7 @@ CityPlots <- ggplot(predicted_cont, aes(x = urbanization_score, y = predicted)) 
 
 #Combine plots
 SitePlots <- ggarrange(CvPPlots, CityPlots, ncol = 2)
-#ggsave("figures/SitePlots.png", SitePlots, width = 6, height = 7.5, dpi = 700,  bg = "white") 
-
-anova(model_list$No.Inv$urbanization_score$null, model_list$No.Inv$urbanization_score$univariate, type = "chisq")
-anova(model_list$No.Contact$urbanization_score$null, model_list$No.Contact$urbanization_score$univariate, type = "chisq")
-anova(model_list$No.Lope$urbanization_score$null, model_list$No.Lope$urbanization_score$univariate, type = "chisq")
-anova(model_list$Solves$urbanization_score$null, model_list$Solves$urbanization_score$univariate, type = "chisq")
-anova(model_list$No.Behav$urbanization_score$null, model_list$No.Behav$urbanization_score$univariate, type = "chisq")
-
-
+#ggsave("figures/FigS1.pdf", SitePlots, width = 6, height = 7.5, dpi = 700,  bg = "white") 
 
 
 

@@ -4,6 +4,9 @@
 .Ruserdata
 scripts/.DS_Store
 .DS_Store
-.DS_Store
-.DS_Store
-.DS_Store
+*.DS_Store
+*.MP4
+*.mp4
+*.MOV
+*.AVI
+*.avi

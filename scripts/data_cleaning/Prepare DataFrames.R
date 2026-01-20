@@ -829,6 +829,15 @@ FinalData$Nat50 <- ifelse(FinalData$SiteID == "NE5", 687.2926, FinalData$Nat50 )
 FinalData$Nat100 <- ifelse(FinalData$SiteID == "NE5", 1254.457, FinalData$Nat100 )
 FinalData$Nat250 <- ifelse(FinalData$SiteID == "NE5", 4928.224, FinalData$Nat250 )
 
+#Revise Nat50 column a little
+unique(FinalData$Nat50)
+FinalData$Total <- 7854
+FinalData <- FinalData %>% dplyr::mutate(PercNat = Nat50/Total*100,
+                                         PercAnth = 100-PercNat)
+
+FinalData <- FinalData %>% dplyr::select(-(c(Nat50, PercNat)))
+FinalData <- FinalData %>% dplyr::rename("Nat50" = PercAnth)
+
 #write.csv(FinalData, file = "EventDataJul2025.csv")
 
 

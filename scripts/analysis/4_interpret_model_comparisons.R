@@ -54,9 +54,9 @@ sub_guide
 
 sub_guide[, sig := ifelse(null_uni_p < 0.05, "yes", "no")]
 
-# >>> All data & no subject ID -----------------------------------------------------------
+# >>> Oriented data & no subject ID -----------------------------------------------------------
 setorder(sub_guide, extent, response, var)
-sub_guide[sensitivity_analysis == "all_data" &
+sub_guide[sensitivity_analysis == "orients" &
             subject_id == "no", .(response, var, extent, sig)]
 
 # >>> All data & subject ID -----------------------------------------------------------

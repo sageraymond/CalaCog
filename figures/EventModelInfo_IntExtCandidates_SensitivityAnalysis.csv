@@ -1,0 +1,17 @@
+,Outcome,Predictor,Component,N,AIC,B,P,Low CI,Upp. CI,ES,Low CI,Upp CI,Marg. R2,Cond. R2
+1,Investigate Duration,Male,Conditional,986,4414.2,0.010,0.880,-0.123,0.144,1.010,0.884,1.155,0.000,0.001
+3,Investigate Duration,Male,Zero Inflation,986,4414.2,-0.106,0.467,-0.391,0.179,0.900,0.676,1.197,0.000,0.001
+2,Investigate Duration,Wood Puzzle,Conditional,986,4414.2,-0.036,0.607,-0.171,0.100,0.965,0.842,1.105,0.000,0.001
+4,Investigate Duration,Wood Puzzle,Zero Inflation,986,4414.2,-0.419,0.004,-0.706,-0.133,0.657,0.494,0.875,0.000,0.001
+5,Contact Duration,Diseased,Conditional,986,2231.5,-0.228,0.062,-0.467,0.011,0.796,0.627,1.011,0.000,0.001
+10,Contact Duration,Diseased,Zero Inflation,986,2231.5,-0.670,0.002,-1.085,-0.255,0.512,0.338,0.775,0.000,0.001
+6,Contact Duration,Daylight,Conditional,986,2231.5,0.169,0.154,-0.063,0.401,1.184,0.939,1.494,0.000,0.001
+11,Contact Duration,Daylight,Zero Inflation,986,2231.5,-0.326,0.102,-0.718,0.065,0.721,0.488,1.067,0.000,0.001
+7,Contact Duration,Male,Conditional,986,2231.5,-0.078,0.506,-0.308,0.152,0.925,0.735,1.164,0.000,0.001
+12,Contact Duration,Male,Zero Inflation,986,2231.5,-0.037,0.843,-0.399,0.326,0.964,0.671,1.386,0.000,0.001
+8,Contact Duration,Second Year,Conditional,986,2231.5,-0.020,0.876,-0.278,0.237,0.980,0.757,1.268,0.000,0.001
+13,Contact Duration,Second Year,Zero Inflation,986,2231.5,-0.506,0.023,-0.943,-0.069,0.603,0.390,0.933,0.000,0.001
+9,Contact Duration,Wood Puzzle,Conditional,986,2231.5,-0.080,0.499,-0.310,0.151,0.924,0.733,1.163,0.000,0.001
+14,Contact Duration,Wood Puzzle,Zero Inflation,986,2231.5,-0.706,<0.001,-1.070,-0.342,0.494,0.343,0.710,0.000,0.001
+15,Escape Gait,Group Size,Conditional,1092,770.9,-0.168,0.331,-0.507,0.171,0.845,0.602,1.187,0.003,0.179
+16,Solves,Male,Conditional,986,332.7,-0.210,0.530,-0.866,0.446,0.811,0.421,1.562,0.002,0.354

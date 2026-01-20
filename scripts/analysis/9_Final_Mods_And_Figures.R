@@ -29,6 +29,11 @@ dat$urbanization <- factor(dat$urbanization, levels = c("Wild", "City"))
 #FIlter to events in which animal was oriented
 dat <- dat[Orient == "Y"]
 
+#Scale Nat50
+dat$Nat50_scaled <- scale(dat$Nat50)
+dat$GroupSize_scaled <- scale(dat$GroupSize)
+
+
 #Create df with city only
 datcity <- dat[urbanization == "City"]
 
@@ -45,35 +50,43 @@ InvFull <- glmmTMB(Inv_duration ~   Sex + PuzzleType + urbanization +
 ConFull <- glmmTMB(Contact_duration ~ urbanization + Disease + Light + Sex + Year + PuzzleType + 
                      (1|SiteID), ziformula = ~ ., family=lognormal(), data = dat)
 
-LopeFull <- glmmTMB(Lope ~ GroupSize + urbanization +
+LopeFull <- glmmTMB(Lope ~ GroupSize_scaled + urbanization +
                       (1|SiteID), family=binomial(link = "logit"), data = dat)
 
 SolveFull <- glmmTMB(Solves ~ Sex + urbanization +
                        (1|SiteID), family=binomial(link = "logit"), data = dat)
 
-InvCityFull <- glmmTMB(Inv_duration ~   Sex + PuzzleType + urbanization_score +
+BDFull <- glmmTMB(Behav_Complexity ~urbanization +
+                       (1|SiteID), family="poisson", data = dat)
+
+
+InvCityFull <- glmmTMB(Inv_duration ~   Sex + PuzzleType + Nat50_scaled +
                          (1|SiteID), ziformula = ~ ., family=lognormal(), data = datcity)
 
-ConCityFull <- glmmTMB(Contact_duration ~ Disease + Light + Sex + Year + PuzzleType + urbanization_score +
+ConCityFull <- glmmTMB(Contact_duration ~ Disease + Light + Sex + Year + PuzzleType + Nat50_scaled +
                          (1|SiteID), ziformula = ~ ., family=lognormal(), data = datcity)
 
-LopeCityFull <- glmmTMB(Lope ~ GroupSize + urbanization_score +
+LopeCityFull <- glmmTMB(Lope ~ GroupSize_scaled + Nat50_scaled +
                           (1|SiteID), family=binomial(link = "logit"), data = datcity)
 
-SolveCityFull <- glmmTMB(Solves ~ Sex + urbanization_score +
+SolveCityFull <- glmmTMB(Solves ~ Sex + Nat50_scaled +
                            (1|SiteID), family=binomial(link = "logit"), data = datcity)
 
+BDCityFull <- glmmTMB(Behav_Complexity ~ Nat50_scaled +
+                           (1|SiteID), family="poisson", data = datcity)
 
 #Extract these data as independent model frames or else LRT will fail later LAME
 mf_Inv     <- model.frame(InvFull)
 mf_Con     <- model.frame(ConFull)
 mf_Lope    <- model.frame(LopeFull)
 mf_Solve   <- model.frame(SolveFull)
+mf_BD   <- model.frame(BDFull)
 
 mf_InvCity  <- model.frame(InvCityFull)
 mf_ConCity  <- model.frame(ConCityFull)
 mf_LopeCity <- model.frame(LopeCityFull)
 mf_SolveCity<- model.frame(SolveCityFull)
+mf_BDCity<- model.frame(BDCityFull)
 
 InvFull <- glmmTMB(Inv_duration ~   Sex + PuzzleType + urbanization +
                      (1|SiteID), ziformula = ~ ., family=lognormal(), data = mf_Inv)
@@ -81,24 +94,30 @@ InvFull <- glmmTMB(Inv_duration ~   Sex + PuzzleType + urbanization +
 ConFull <- glmmTMB(Contact_duration ~ urbanization + Disease + Light + Sex + Year + PuzzleType + 
                      (1|SiteID), ziformula = ~ ., family=lognormal(), data = mf_Con)
 
-LopeFull <- glmmTMB(Lope ~ GroupSize + urbanization +
+LopeFull <- glmmTMB(Lope ~ GroupSize_scaled + urbanization +
                       (1|SiteID), family=binomial(link = "logit"), data = mf_Lope)
 
 SolveFull <- glmmTMB(Solves ~ Sex + urbanization +
                        (1|SiteID), family=binomial(link = "logit"), data = mf_Solve)
 
-InvCityFull <- glmmTMB(Inv_duration ~   Sex + PuzzleType + urbanization_score +
+BDFull <- glmmTMB(Behav_Complexity ~ urbanization +
+                       (1|SiteID), family="poisson", data = mf_BD)
+
+
+InvCityFull <- glmmTMB(Inv_duration ~   Sex + PuzzleType + Nat50_scaled +
                          (1|SiteID), ziformula = ~ ., family=lognormal(), data = mf_InvCity)
 
-ConCityFull <- glmmTMB(Contact_duration ~ Disease + Light + Sex + Year + PuzzleType + urbanization_score +
+ConCityFull <- glmmTMB(Contact_duration ~ Disease + Light + Sex + Year + PuzzleType + Nat50_scaled +
                          (1|SiteID), ziformula = ~ ., family=lognormal(), data = mf_ConCity)
 
-LopeCityFull <- glmmTMB(Lope ~ GroupSize + urbanization_score +
+LopeCityFull <- glmmTMB(Lope ~ GroupSize_scaled + Nat50_scaled +
                           (1|SiteID), family=binomial(link = "logit"), data = mf_LopeCity)
 
-SolveCityFull <- glmmTMB(Solves ~ Sex + urbanization_score +
+SolveCityFull <- glmmTMB(Solves ~ Sex + Nat50_scaled +
                            (1|SiteID), family=binomial(link = "logit"), data = mf_SolveCity)
 
+BDCityFull <- glmmTMB(Behav_Complexity ~ Nat50_scaled +
+                           (1|SiteID), family="poisson", data = mf_BDCity)
 
 
 
@@ -109,7 +128,7 @@ Inv <- glmmTMB(Inv_duration ~   Sex + PuzzleType +
 Con <- glmmTMB(Contact_duration ~ Disease + Light + Sex + Year + PuzzleType + 
                  (1|SiteID), ziformula = ~ ., family=lognormal(), data = mf_Con)
 
-Lope <- glmmTMB(Lope ~ GroupSize + 
+Lope <- glmmTMB(Lope ~ GroupSize_scaled + 
                   (1|SiteID), family=binomial(link = "logit"), data = mf_Lope)
 
 Solve <- glmmTMB(Solves ~ Sex + 
@@ -121,7 +140,7 @@ InvCity <- glmmTMB(Inv_duration ~   Sex + PuzzleType +
 ConCity <- glmmTMB(Contact_duration ~ Disease + Light + Sex + Year + PuzzleType + 
                      (1|SiteID), ziformula = ~ ., family=lognormal(), data = mf_ConCity)
 
-LopeCity <- glmmTMB(Lope ~ GroupSize + 
+LopeCity <- glmmTMB(Lope ~ GroupSize_scaled + 
                       (1|SiteID), family=binomial(link = "logit"), data = mf_LopeCity)
 
 SolveCity <- glmmTMB(Solves ~ Sex + 
@@ -141,16 +160,16 @@ LopeUrb <- glmmTMB(Lope ~ urbanization +
 SolveUrb <- glmmTMB(Solves ~ urbanization +
                       (1|SiteID), family=binomial(link = "logit"), data = mf_Solve)
 
-InvCityUrb <- glmmTMB(Inv_duration ~   urbanization_score +
+InvCityUrb <- glmmTMB(Inv_duration ~   Nat50_scaled +
                         (1|SiteID), ziformula = ~ ., family=lognormal(), data = mf_InvCity)
 
-ConCityUrb <- glmmTMB(Contact_duration ~ urbanization_score +
+ConCityUrb <- glmmTMB(Contact_duration ~ Nat50_scaled +
                         (1|SiteID), ziformula = ~ ., family=lognormal(), data = mf_ConCity)
 
-LopeCityUrb <- glmmTMB(Lope ~ urbanization_score +
+LopeCityUrb <- glmmTMB(Lope ~ Nat50_scaled +
                          (1|SiteID), family=binomial(link = "logit"), data = mf_LopeCity)
 
-SolveCityUrb <- glmmTMB(Solves ~ urbanization_score +
+SolveCityUrb <- glmmTMB(Solves ~ Nat50_scaled +
                           (1|SiteID), family=binomial(link = "logit"), data = mf_SolveCity)
 
 

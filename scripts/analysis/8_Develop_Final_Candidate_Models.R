@@ -52,13 +52,43 @@ Solve <- glmmTMB(Solves ~ Sex +
 
 #Build function to pull info out of glmmTMB models (thanks, Lundy!)-------------
 tidy_glmmTMB <- function(m) {
-  dt <- tidy(m, effects = "fixed", component = "cond", conf.int = TRUE) |> as.data.table()
-  dt[, `:=`(
-    OR = exp(estimate), 
-    OR_low = exp(conf.low), 
-    OR_high = exp(conf.high)
+  # Extract both conditional and zero-inflation components
+  cond_dt <- tidy(m, effects = "fixed", component = "cond", conf.int = TRUE) |> as.data.table()
+  zi_dt   <- tidy(m, effects = "fixed", component = "zi", conf.int = TRUE) |> as.data.table()
+  
+  # Add component labels
+  cond_dt[, component := "conditional"]
+  zi_dt[, component := "zero_inflation"]
+  
+  # Ensure both have same columns
+  for (dt in list(cond_dt, zi_dt)) {
+    if (nrow(dt) > 0) {
+      dt[, `:=`(
+        OR = exp(estimate), 
+        OR_low = exp(conf.low), 
+        OR_high = exp(conf.high)
+      )]
+    } else {
+      # Add empty OR columns to keep structure consistent
+      dt[, `:=`(
+        estimate = numeric(),
+        std.error = numeric(),
+        conf.low = numeric(),
+        conf.high = numeric(),
+        p.value = numeric(),
+        OR = numeric(),
+        OR_low = numeric(),
+        OR_high = numeric(),
+        term = character()
+      )]
+    }
+  }
+  
+  # Combine and return with consistent columns
+  rbindlist(list(cond_dt, zi_dt), fill = TRUE)[, .(
+    component, term, estimate, std.error, conf.low, conf.high, 
+    p.value, OR, OR_low, OR_high
   )]
-  dt[, .(term, estimate, std.error, conf.low, conf.high, p.value, OR, OR_low, OR_high)]
 }
 
 #Build function to extract model statistics
@@ -99,22 +129,44 @@ extract_r2 <- function(m) {
 }
 
 #Now I need to make a model list-----------------------------------------------
+Invdat <- model.frame(Inv)
+Condat <- model.frame(Con)
+Lopedat <- model.frame(Lope)
+Solvedat <- model.frame(Solve)
+
+Inv <- glmmTMB(Inv_duration ~   Sex + PuzzleType + 
+                 (1|SiteID), ziformula = ~ ., family=lognormal(), data = Invdat)
+
+Con <- glmmTMB(Contact_duration ~ Disease + Light + Sex + Year + PuzzleType + 
+                 (1|SiteID), ziformula = ~ ., family=lognormal(), data = Condat)
+
+Lope <- glmmTMB(Lope ~ GroupSize + 
+                  (1|SiteID), family=binomial(link = "logit"), data = Lopedat)
+
+Solve <- glmmTMB(Solves ~ Sex + 
+                   (1|SiteID), family=binomial(link = "logit"), data = Solvedat)
+
+
 model_list <- list(Inv = Inv,
                    Con = Con,
                    Lope = Lope,
                    Solve = Solve)
 
-#I guess I have to write nulls. I'm sure there is a better way. Oh well.
+
+
+
+#I guess I have to write nulls. I'm sure there is a better way. Oh well
+
 Inv_null <- glmmTMB(Inv_duration ~  1 + 
-                 (1|SiteID), ziformula = ~ ., family=lognormal(), data = model.frame(Inv))
+                 (1|SiteID), ziformula = ~ ., family=lognormal(), data = Invdat)
 Con_null <- glmmTMB(Contact_duration ~ 1 + 
-                 (1|SiteID), ziformula = ~ ., family=lognormal(), data = model.frame(Con))
+                 (1|SiteID), ziformula = ~ ., family=lognormal(), data = Condat)
 
 Lope_null <- glmmTMB(Lope ~ 1 + 
-                  (1|SiteID), family=binomial(link = "logit"), data = model.frame(Lope))
+                  (1|SiteID), family=binomial(link = "logit"), data = Lopedat)
 
 Solve_null <- glmmTMB(Solves ~ 1 + 
-                   (1|SiteID), family=binomial(link = "logit"), data = model.frame(Solve))
+                   (1|SiteID), family=binomial(link = "logit"), data = Solvedat)
 
 null_model_list <- list(Inv_null, Con_null, Lope_null, Solve_null)
 names(null_model_list) <- names(model_list)
@@ -182,7 +234,7 @@ InvPlot <- ggplot(all_coefs_Inv, aes(x = term, y = estimate, color = "tomato")) 
   geom_hline(yintercept = 0, linetype = "dashed") +
   facet_wrap(~part, scales = "free_x") +
   theme_classic() +
-  labs(title = "A. Investigate Duration",
+  labs(title = "A. Exploration Duration",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
@@ -208,7 +260,7 @@ ConPlot <- ggplot(all_coefs_Con, aes(x = term, y = estimate, color = "tomato")) 
   geom_hline(yintercept = 0, linetype = "dashed") +
   facet_wrap(~part, scales = "free_x") +
   theme_classic() +
-  labs(title = "B. Contact Duration",
+  labs(title = "C. Persistence",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
@@ -228,7 +280,7 @@ LopePlot <- ggplot(coef_Lope, aes(x = term, y = estimate, color = "tomato")) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   #facet_wrap(~part, scales = "free_x") +
   theme_classic() +
-  labs(title = "C. Escape Gait",
+  labs(title = "B. Fearfulness",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
@@ -249,7 +301,7 @@ SolvePlot <- ggplot(coef_Solve, aes(x = term, y = estimate, color = "tomato")) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   #facet_wrap(~part, scales = "free_x") +
   theme_classic() +
-  labs(title = "D. Solves",
+  labs(title = "D. Solution",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
@@ -262,5 +314,98 @@ SolvePlot <- ggplot(coef_Solve, aes(x = term, y = estimate, color = "tomato")) +
 
 #Put all plots together
 FinalPlot <- ggarrange(InvPlot, LopePlot, ConPlot, SolvePlot, nrow = 2, widths = c(5,3))
-#ggsave("figures/IntExtCandidateModelPlot.png", FinalPlot, width = 8, height = 6, dpi = 700,  bg = "white") 
+#ggsave("figures/FigS2.pdf", FinalPlot, width = 8, height = 6, dpi = 700,  bg = "white") 
 
+
+
+
+#Repeat for sensitivity analysis where we know individual
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --------------------------------------
+# 1. List of models I am trying to build:
+#Inv Duration + Sex + Puzzle Type
+#Con Duration + disease, light, sex, year, puzzle
+# escape gait + group size
+# solves + sex
+
+datS <- dat[Subject != "NA"]
+
+#I think the best way is to just bust these out manually...
+InvS <- glmmTMB(Inv_duration ~   Sex + PuzzleType + 
+                 (1|SiteID/Subject), ziformula = ~ ., family=lognormal(), data = datS)
+
+ConS <- glmmTMB(Contact_duration ~ Disease + Light + Sex + Year + PuzzleType + 
+                 (1|SiteID/Subject), ziformula = ~ ., family=lognormal(), data = datS)
+
+LopeS <- glmmTMB(Lope ~ GroupSize + 
+                  (1|SiteID/Subject), family=binomial(link = "logit"), data = datS)
+
+SolveS <- glmmTMB(Solves ~ Sex + 
+                   (1|SiteID/Subject), family=binomial(link = "logit"), data = datS)
+
+#Now I need to make a model list-----------------------------------------------
+InvdatS <- model.frame(InvS)
+CondatS <- model.frame(ConS)
+LopedatS <- model.frame(LopeS)
+SolvedatS <- model.frame(SolveS)
+
+InvS <- glmmTMB(Inv_duration ~   Sex + PuzzleType + 
+                 (1|SiteID), ziformula = ~ ., family=lognormal(), data = InvdatS)
+
+ConS <- glmmTMB(Contact_duration ~ Disease + Light + Sex + Year + PuzzleType + 
+                 (1|SiteID), ziformula = ~ ., family=lognormal(), data = CondatS)
+
+LopeS <- glmmTMB(Lope ~ GroupSize + 
+                  (1|SiteID), family=binomial(link = "logit"), data = LopedatS)
+
+SolveS <- glmmTMB(Solves ~ Sex + 
+                   (1|SiteID), family=binomial(link = "logit"), data = SolvedatS)
+
+
+model_list <- list(Inv = InvS,
+                   Con = ConS,
+                   Lope = LopeS,
+                   Solve = SolveS)
+
+
+
+
+#I guess I have to write nulls. I'm sure there is a better way. Oh well
+
+Inv_nullS <- glmmTMB(Inv_duration ~  1 + 
+                      (1|SiteID/Subject), ziformula = ~ ., family=lognormal(), data = InvdatS)
+Con_nullS <- glmmTMB(Contact_duration ~ 1 + 
+                      (1|SiteID/Subject), ziformula = ~ ., family=lognormal(), data = CondatS)
+
+Lope_nullS <- glmmTMB(Lope ~ 1 + 
+                       (1|SiteID/Subject), family=binomial(link = "logit"), data = LopedatS)
+
+Solve_nullS <- glmmTMB(Solves ~ 1 + 
+                        (1|SiteID/Subject), family=binomial(link = "logit"), data = SolvedatS)
+
+null_model_list <- list(Inv_nullS, Con_nullS, Lope_nullS, Solve_nullS)
+names(null_model_list) <- names(model_list)
+
+# NOW do the thing
+summary_tableS <- rbindlist(lapply(names(model_list), function(name) {
+  mod <- model_list[[name]]
+  null_mod <- null_model_list[[name]]
+  
+  tidy_dt <- tidy_glmmTMB(mod)
+  
+  
+  stats_dt <- extract_model_stats(mod)
+  
+  lrt_dt <- extract_lrt(mod, null_mod)
+  r2_dt <- extract_r2(mod)
+  
+  tidy_dt[, response := name]
+  for (col in names(stats_dt)) tidy_dt[, (col) := stats_dt[[col]]]
+  for (col in names(lrt_dt)) tidy_dt[, (col) := lrt_dt[[col]]]
+  for (col in names(r2_dt)) tidy_dt[, (col) := r2_dt[[col]]]
+  
+  tidy_dt
+}))
+
+
+summary_tableS <- summary_tableS[term != "(Intercept)"]
+#write.csv(summary_tableS, "figures/EventModelInfo_IntExtCandidates_SensitivityAnalysis.csv")

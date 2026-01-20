@@ -1,33 +1,33 @@
-,response,model_type,AIC,logLik,R2_marginal,R2_conditional
-1,InvUrb,model_null,4587.481437,-2288.740719,0.0000000,0.001044849
-2,InvUrb,model_urban,4579.43089,-2282.715445,0.0000003,0.001042474
-3,InvUrb,model_intrinsic,4586.272141,-2284.136071,0.0000131,0.001055569
-4,InvUrb,model_full,4578.497017,-2278.248509,0.0000131,0.001052504
-5,ConUrb,model_null,2330.036155,-1160.018078,0.0000000,0.000659617
-6,ConUrb,model_urban,2321.798093,-1153.899047,0.0007286,0.00129773
-7,ConUrb,model_intrinsic,2309.91582,-1139.95791,0.0003398,0.000827023
-8,ConUrb,model_full,2303.248129,-1134.624065,0.0014214,0.001797186
-9,LopeUrb,model_null,850.0157382,-423.0078691,0.0000000,0.192836601
-10,LopeUrb,model_urban,819.9620069,-406.9810035,0.0921620,0.132552291
-11,LopeUrb,model_intrinsic,849.6911589,-421.8455795,0.0060006,0.204368226
-12,LopeUrb,model_full,819.3522066,-405.6761033,0.0981840,0.139308334
-13,SolveUrb,model_null,347.7318949,-171.8659474,0.0000000,0.345624058
-14,SolveUrb,model_urban,342.0838079,-168.0419039,0.8974545,0.92790547
-15,SolveUrb,model_intrinsic,349.5730723,-171.7865361,0.0008392,0.344966755
-16,SolveUrb,model_full,343.9688059,-167.9844029,0.8970393,0.927570201
-17,InvCity,model_null,4322.30504,-2156.15252,0.0000000,0.000950275
-18,InvCity,model_urban,4324.560813,-2155.280407,0.0000395,0.000979701
-19,InvCity,model_intrinsic,4319.052238,-2150.526119,0.0000105,0.000973869
-20,InvCity,model_full,4320.836823,-2149.418411,0.0000523,0.000998755
-21,ConCity,model_null,2234.695416,-1112.347708,0.0000000,0.000571638
-22,ConCity,model_urban,2238.361788,-1112.180894,0.0000032,0.000562474
-23,ConCity,model_intrinsic,2211.153846,-1090.576923,0.0004549,0.00080593
-24,ConCity,model_full,2214.662428,-1090.331214,0.0005259,0.000834926
-25,LopeCity,model_null,613.8136292,-304.9068146,0.0000000,0.057156954
-26,LopeCity,model_urban,614.7869142,-304.3934571,0.0060542,0.059184816
-27,LopeCity,model_intrinsic,609.8606333,-301.9303167,0.0355544,0.085809726
-28,LopeCity,model_full,610.9667225,-301.4833613,0.0420324,0.089635112
-29,SolveCity,model_null,340.0838079,-168.0419039,0.0000000,0.296951662
-30,SolveCity,model_urban,342.0799207,-168.0399603,0.0000626,0.297970911
-31,SolveCity,model_intrinsic,341.9688058,-167.9844029,0.0006494,0.296986774
-32,SolveCity,model_full,343.9637832,-167.9818916,0.0007158,0.298120396
+,Extent,Response,Model,AIC,M R2,C R2
+1,City + Wild,Investigate Duration,Null,4587.5,0.000,0.001
+2,City + Wild,Investigate Duration,Urbanization Only,4579.4,0.000,0.001
+3,City + Wild,Investigate Duration,Intrinsic/ Extrinsic,4586.3,0.000,0.001
+4,City + Wild,Investigate Duration,Full,4578.5,0.000,0.001
+5,City + Wild,Contact Duration,Null,2330.0,0.000,0.001
+6,City + Wild,Contact Duration,Urbanization Only,2321.8,0.001,0.001
+7,City + Wild,Contact Duration,Intrinsic/ Extrinsic,2309.9,0.000,0.001
+8,City + Wild,Contact Duration,Full,2303.2,0.001,0.002
+9,City + Wild,Escape Gait,Null,850.0,0.000,0.193
+10,City + Wild,Escape Gait,Urbanization Only,820.0,0.092,0.133
+11,City + Wild,Escape Gait,Intrinsic/ Extrinsic,849.7,0.006,0.204
+12,City + Wild,Escape Gait,Full,819.4,0.098,0.139
+13,City + Wild,Solves,Null,347.7,0.000,0.346
+14,City + Wild,Solves,Urbanization Only,342.1,0.897,0.928
+15,City + Wild,Solves,Intrinsic/ Extrinsic,349.6,0.001,0.345
+16,City + Wild,Solves,Full,344.0,0.897,0.928
+17,City Only,Investigate Duration,Null,4322.3,0.000,0.001
+18,City Only,Investigate Duration,Urbanization Only,4322.6,0.000,0.001
+19,City Only,Investigate Duration,Intrinsic/ Extrinsic,4319.1,0.000,0.001
+20,City Only,Investigate Duration,Full,4319.6,0.000,0.001
+21,City Only,Contact Duration,Null,2234.7,0.000,0.001
+22,City Only,Contact Duration,Urbanization Only,2236.4,0.000,0.001
+23,City Only,Contact Duration,Intrinsic/ Extrinsic,2211.2,0.000,0.001
+24,City Only,Contact Duration,Full,2211.6,0.001,0.001
+25,City Only,Escape Gait,Null,613.8,0.000,0.057
+26,City Only,Escape Gait,Urbanization Only,614.9,0.005,0.056
+27,City Only,Escape Gait,Intrinsic/ Extrinsic,609.9,0.036,0.086
+28,City Only,Escape Gait,Full,610.9,0.042,0.086
+29,City Only,Solves,Null,340.1,0.000,0.297
+30,City Only,Solves,Urbanization Only,335.6,0.096,0.254
+31,City Only,Solves,Intrinsic/ Extrinsic,342.0,0.001,0.297
+32,City Only,Solves,Full,337.5,0.097,0.254

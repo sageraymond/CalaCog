@@ -192,3 +192,54 @@ dat[Solves == 0, ]
 #' [Inv_dispersion == lognormal + ziformula + scale]
 #' [Lope == binomial]
 #' [Solves == binomial]
+#' 
+#' 
+#' #Some summary for first p of results
+dat %>% group_by(urbanization) %>% summarise(N = n())
+dat1 <- dat %>% dplyr::filter(Orient == "Y")
+
+dat1 %>% group_by(Inv_duration) %>% summarise(N = n())
+min(dat1$Inv_duration, na.rm = TRUE)
+max(dat1$Inv_duration, na.rm = TRUE)
+dat1 %>% group_by(urbanization, Inv_duration) %>% summarise(N = n())
+
+dat2 <- dat1 %>% dplyr::filter(urbanization == "Wild")
+dat2 %>% group_by(Inv_duration) %>% summarise(N = n())
+
+
+dat1 %>% group_by(Contact_duration) %>% summarise(N = n())
+min(dat1$Contact_duration, na.rm = TRUE)
+max(dat1$Contact_duration, na.rm = TRUE)
+dat1 %>% group_by(urbanization, Contact_duration) %>% summarise(N = n())
+
+dat2 <- dat1 %>% dplyr::filter(urbanization == "Wild")
+dat2 %>% group_by(Inv_duration) %>% summarise(N = n())
+dat2 %>% group_by(Contact_duration) %>% summarise(N = n())
+
+mean(dat1$Behav_Complexity, na.rm = TRUE)
+sd(dat1$Behav_Complexity, na.rm = TRUE)
+min(dat1$Behav_Complexity, na.rm = TRUE)
+max(dat1$Behav_Complexity, na.rm = TRUE)
+
+dat1 %>% group_by(Lope) %>% summarise(N = n())
+dat2 %>% group_by(Lope) %>% summarise(N = n())
+
+dat1 %>% group_by(Solves) %>% summarise(N = n())
+dat2 %>% group_by(Solves) %>% summarise(N = n())
+
+dat1 %>% group_by(Sex) %>% summarise(N = n())
+dat1 %>% group_by(Disease) %>% summarise(N = n())
+dat1 %>% group_by(urbanization, Disease) %>% summarise(N = n())
+
+dat1 %>% group_by(Light) %>% summarise(N = n())
+dat1 %>% group_by(GroupSize) %>% summarise(N = n())
+
+mean(dat1$temp, na.rm = TRUE)
+sd(dat1$temp, na.rm = TRUE)
+min(dat1$temp, na.rm = TRUE)
+max(dat1$temp, na.rm = TRUE)
+
+dat1 %>% group_by(PuzzleType) %>% summarise(N = n())
+
+head(dat)
+xxx <- dat %>% dplyr::filter(Behav_Complexity > 4)

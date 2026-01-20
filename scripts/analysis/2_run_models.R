@@ -80,7 +80,7 @@ m <- c()
 # sub.dat <- c() #' [This might not be necessary]
 i <- 1
 #' *Note that some models won't run because there is insufficient N for their random effects*
-working_guide <- guide[!file.exists(model_path), ]
+working_guide <- guide[!file.exists(model_path), ] #this is if you want to run everybpdy
 
 warnings <- list()
 sub_dat <- c()
