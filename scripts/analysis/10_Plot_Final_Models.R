@@ -1,7 +1,3 @@
-#Goal here is STILL to use bits of Erick code (without destroying them) to complete what
-#I feel to be the logical progression of the analysis
-
-
 rm(list = ls())
 gc()
 
@@ -36,7 +32,7 @@ dat$GroupSize_scaled <- scale(dat$GroupSize)
 #Create df with city only
 datcity <- dat[urbanization == "City"]
 
-#Step1. Create. There should be 8 of them (what to do about behavioural complexity...)-----------------------
+#Step1. Create. There should be 8 of them ----------------------
 #Step 1: Build FULL models------------------------------------------
 InvFinal <- glmmTMB(Inv_duration ~   Sex + PuzzleType + urbanization +
                      (1|SiteID), ziformula = ~ ., family=lognormal(), data = dat)
@@ -131,37 +127,50 @@ all_model_coefs[, term := fcase(
 all_model_coefs <- all_model_coefs[term != "(Intercept)"]
 
 unique(all_model_coefs$term)
-all_model_coefs$term <- factor(all_model_coefs$term, levels = c("City",
-                                                                "Urbanization (%)",
-                                                                "Male",
+all_model_coefs$term <- factor(all_model_coefs$term, levels = c("Male",
                                                                 "Wood Puzzle",
                                                                 "Diseased",
                                                                 "Daylight",
                                                                 "Second Year",
-                                                               "Group Size"))
+                                                               "Group Size",
+                                                               "Urbanization (%)",
+                                                               "City"))
+
+all_model_coefs$part <- factor(all_model_coefs$part, levels = c("Zero-inflation",
+                                                                "Conditional"))
+
+
 # Plot Inv (all sites)
+facet_labels <- c(
+  "Zero-inflation" = "Odds of zero value (Zero-inflation)",
+  "Conditional" = "Overall Effect (Conditional)"
+)
+
 InvPlot <- ggplot(data = all_model_coefs[model_name == "InvFinal"],
                   aes(x = term, y = estimate, color = term)) +
   geom_point(position = position_dodge(width = 0.5), size = 5) +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
                 width = 0.2, position = position_dodge(width = 0.5), size = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  facet_wrap(~part, scales = "free_x") +
+  facet_wrap(~part, scales = "free_x",
+             labeller = labeller(part = facet_labels),
+             ncol = 1) +
   theme_classic() +
-  labs(title = "A. Exploration Duration (All Sites)",
+  labs(title = "C. Exploration Duration (All Sites)",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   scale_color_manual(values = c(
-    "City" = "#0072B2",
-    "Male" = "tomato",
-    "Wood Puzzle" = "tomato")) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "plain", size = 12),
+    "City" = "#78206E",
+    "Male" = "#84828f",
+    "Wood Puzzle" = "#84828f")) +
+  coord_flip()+
+  theme(axis.text.x = element_text(colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
         axis.title.y = element_text(colour = "black", face = "plain", size = 12),
         legend.text = element_text(colour = "black", face = "plain", size = 12),
         legend.title = element_blank(),
         legend.position = "none",
         strip.text = element_text(size = 12, face = "plain"))
-
+InvPlot
 
 #Plot Con (All Sites)-------------------------------------------------------------------
 ConPlot <- ggplot(data = all_model_coefs[model_name == "ConFinal"],
@@ -170,24 +179,30 @@ ConPlot <- ggplot(data = all_model_coefs[model_name == "ConFinal"],
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
                 width = 0.2, position = position_dodge(width = 0.5), size = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  facet_wrap(~part, scales = "free_x") +
+  facet_wrap(~part, scales = "free_x",
+             labeller = labeller(part = facet_labels),
+             ncol = 1) +
   theme_classic() +
-  labs(title = "B. Persistence (All Sites)",
+  labs(title = "D. Persistence (All Sites)",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   scale_color_manual(values = c(
-    "City" = "#0072B2",
-    "Male" = "tomato",
-    "Wood Puzzle" = "tomato",
-    "Diseased" = "tomato",
-    "Daylight" = "tomato",
-    "Second Year" = "tomato")) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "plain", size = 12),
+    "City" = "#78206E",
+    "Male" = "#84828f",
+    "Wood Puzzle" = "#84828f",
+    "Diseased" = "#84828f",
+    "Daylight" = "#84828f",
+    "Second Year" = "#84828f")) +
+  coord_flip()+
+  theme(axis.text.x = element_text(colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
         axis.title.y = element_text(colour = "black", face = "plain", size = 12),
         legend.text = element_text(colour = "black", face = "plain", size = 12),
         legend.title = element_blank(),
         legend.position = "none",
         strip.text = element_text(size = 12, face = "plain"))
+ConPlot
+
+
 
 #Plot Lope-------------------------------------------------------------------
 LopePlot <- ggplot(data = all_model_coefs[model_name == "LopeFinal"],
@@ -198,11 +213,12 @@ LopePlot <- ggplot(data = all_model_coefs[model_name == "LopeFinal"],
   geom_hline(yintercept = 0, linetype = "dashed") +
   facet_wrap(~part, scales = "free_x") +
   theme_classic() +
-  labs(title = "G. Fearfulness\n(All Sites)",
+  labs(title = "E. Fearfulness (All Sites)",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   scale_color_manual(values = c(
-    "City" = "#0072B2",
-    "Group Size" = "tomato")) +
+    "City" = "#78206E",
+    "Group Size" = "#84828f")) +
+  coord_flip()+
   theme(axis.text.x = element_text(colour = "black", face = "plain", size = 11),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
         axis.title.y = element_text(colour = "black", face = "plain", size = 12),
@@ -210,6 +226,7 @@ LopePlot <- ggplot(data = all_model_coefs[model_name == "LopeFinal"],
         legend.title = element_blank(),
         legend.position = "none",
         strip.text = element_blank())
+LopePlot
 
 #Solve plot (All Sites)-----------------------------------------------------------------
 SolvePlot <- ggplot(data = all_model_coefs[model_name == "SolveFinal"],
@@ -219,11 +236,13 @@ SolvePlot <- ggplot(data = all_model_coefs[model_name == "SolveFinal"],
   #              width = 0.2, position = position_dodge(width = 0.5), size = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   facet_wrap(~part, scales = "free_x") +
+  coord_flip()+
   theme_classic() +
-  labs(title = "I. Solutions\n(All Sites)*",
+  labs(title = "A. Solutions (All Sites)*",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   scale_color_manual(values = c(
-    "City" = "#0072B2")) +
+    "City" = "#78206E")) +
+  coord_flip()+
   theme(axis.text.x = element_text(colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
         axis.title.y = element_text(colour = "black", face = "plain", size = 12),
@@ -231,6 +250,9 @@ SolvePlot <- ggplot(data = all_model_coefs[model_name == "SolveFinal"],
         legend.title = element_blank(),
         legend.position = "none",
         strip.text = element_blank())
+
+SolvePlot
+
 
 #BD plot (All Sites)-----------------------------------------------------------------
 BDPlot <- ggplot(data = all_model_coefs[model_name == "BDFinal"],
@@ -240,11 +262,12 @@ BDPlot <- ggplot(data = all_model_coefs[model_name == "BDFinal"],
                 width = 0.2, position = position_dodge(width = 0.5), size = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   facet_wrap(~part, scales = "free_x") +
+  coord_flip()+
   theme_classic() +
-  labs(title = "E. Behavioural\nDiversity\n(All Sites)",
+  labs(title = "E. Behavioural Diversity (All Sites)",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   scale_color_manual(values = c(
-    "City" = "#0072B2")) +
+    "City" = "#78206E")) +
   theme(axis.text.x = element_text(colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
         axis.title.y = element_text(colour = "black", face = "plain", size = 12),
@@ -252,7 +275,7 @@ BDPlot <- ggplot(data = all_model_coefs[model_name == "BDFinal"],
         legend.title = element_blank(),
         legend.position = "none",
         strip.text = element_blank())
-
+BDPlot
 
 
 #Inv-city sites-----------------------------------------------------------------
@@ -262,22 +285,25 @@ InvPlotCity <- ggplot(data = all_model_coefs[model_name == "InvCityFinal"],
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
                 width = 0.2, position = position_dodge(width = 0.5), size = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  facet_wrap(~part, scales = "free_x") +
+  facet_wrap(~part, scales = "free_x",
+             labeller = labeller(part = facet_labels),
+             ncol = 1) +
+  coord_flip()+
   theme_classic() +
-  labs(title = "C. Exploration Duration (City Sites)",
+  labs(title = "H. Exploration Duration (City Sites)",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   scale_color_manual(values = c(
-    "Urbanization (%)" = "#0072B2",
-    "Male" = "tomato",
-    "Wood Puzzle" = "tomato")) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "plain", size = 12),
+    "Urbanization (%)" = "#78206E",
+    "Male" = "#84828f",
+    "Wood Puzzle" = "#84828f")) +
+  theme(axis.text.x = element_text(colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
         axis.title.y = element_text(colour = "black", face = "plain", size = 12),
         legend.text = element_text(colour = "black", face = "plain", size = 12),
         legend.title = element_blank(),
         legend.position = "none",
         strip.text = element_text(size = 12, face = "plain"))
-
+InvPlotCity
 
 #Plot Con (All Sites)-------------------------------------------------------------------
 ConPlotCity <- ggplot(data = all_model_coefs[model_name == "ConCityFinal"],
@@ -286,24 +312,30 @@ ConPlotCity <- ggplot(data = all_model_coefs[model_name == "ConCityFinal"],
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
                 width = 0.2, position = position_dodge(width = 0.5), size = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  facet_wrap(~part, scales = "free_x") +
+  facet_wrap(~part, scales = "free_x",
+             labeller = labeller(part = facet_labels),
+             ncol = 1) +
+  coord_flip()+
   theme_classic() +
-  labs(title = "D. Persistence (City Sites)",
+  labs(title = "I. Persistence (City Sites)",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   scale_color_manual(values = c(
-    "Urbanization (%)" = "#0072B2",
-    "Diseased" = "tomato",
-    "Daylight" = "tomato",
-    "Second Year" = "tomato",
-    "Male" = "tomato",
-    "Wood Puzzle" = "tomato")) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "plain", size = 12),
+    "Urbanization (%)" = "#78206E",
+    "Diseased" = "#84828f",
+    "Daylight" = "#84828f",
+    "Second Year" = "#84828f",
+    "Male" = "#84828f",
+    "Wood Puzzle" = "#84828f")) +
+  theme(axis.text.x = element_text(colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
         axis.title.y = element_text(colour = "black", face = "plain", size = 12),
         legend.text = element_text(colour = "black", face = "plain", size = 12),
         legend.title = element_blank(),
         legend.position = "none",
         strip.text = element_text(size = 12, face = "plain"))
+
+ConPlotCity
+
 
 #Plot Lope-------------------------------------------------------------------
 LopePlotCity <- ggplot(data = all_model_coefs[model_name == "LopeCityFinal"],
@@ -312,13 +344,15 @@ LopePlotCity <- ggplot(data = all_model_coefs[model_name == "LopeCityFinal"],
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
                 width = 0.2, position = position_dodge(width = 0.5), size = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  facet_wrap(~part, scales = "free_x") +
+  facet_wrap(~part, scales = "free_x",
+             ncol = 1) +
+  coord_flip()+
   theme_classic() +
-  labs(title = "H. Fearfulness\n(City Sites)",
+  labs(title = "J. Fearfulness\n(City Sites)",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   scale_color_manual(values = c(
-    "Urbanization (%)" = "#0072B2",
-    "Group Size" = "tomato")) +
+    "Urbanization (%)" = "#78206E",
+    "Group Size" = "#84828f")) +
   theme(axis.text.x = element_text( colour = "black", face = "plain", size = 11),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
         axis.title.y = element_text(colour = "black", face = "plain", size = 12),
@@ -327,6 +361,8 @@ LopePlotCity <- ggplot(data = all_model_coefs[model_name == "LopeCityFinal"],
         legend.position = "none",
         strip.text = element_blank())
 
+LopePlotCity
+
 #Solve plot (All Sites)-----------------------------------------------------------------
 SolvePlotCity <- ggplot(data = all_model_coefs[model_name == "SolveCityFinal"],
                     aes(x = term, y = estimate, color = term)) +
@@ -334,13 +370,14 @@ SolvePlotCity <- ggplot(data = all_model_coefs[model_name == "SolveCityFinal"],
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
                 width = 0.2, position = position_dodge(width = 0.5), size = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  facet_wrap(~part, scales = "free_x") +
+  coord_flip()+
+  facet_wrap(~part, scales = "free_x", ncol = 1) +
   theme_classic() +
-  labs(title = "J. Solutions\n(City Sites)",
+  labs(title = "F. Solutions (City Sites)",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   scale_color_manual(values = c(
-    "Urbanization (%)" = "#0072B2",
-    "Male" = "tomato")) +
+    "Urbanization (%)" = "#78206E",
+    "Male" = "#84828f")) +
   theme(axis.text.x = element_text(colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
         axis.title.y = element_text(colour = "black", face = "plain", size = 12),
@@ -348,6 +385,8 @@ SolvePlotCity <- ggplot(data = all_model_coefs[model_name == "SolveCityFinal"],
         legend.title = element_blank(),
         legend.position = "none",
         strip.text = element_blank())
+
+SolvePlotCity
 
 #BD plot (City Sites)-----------------------------------------------------------------
 BDPlotCity <- ggplot(data = all_model_coefs[model_name == "BDCityFinal"],
@@ -356,12 +395,13 @@ BDPlotCity <- ggplot(data = all_model_coefs[model_name == "BDCityFinal"],
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
                 width = 0.2, position = position_dodge(width = 0.5), size = 1) +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  facet_wrap(~part, scales = "free_x") +
+  facet_wrap(~part, scales = "free_x", ncol = 1) +
+  coord_flip()+
   theme_classic() +
-  labs(title = "F. Behavioural\nDiversity\n(City Sites)",
+  labs(title = "G. Behavioural Diversity (City Sites)",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   scale_color_manual(values = c(
-    "Urbanization (%)" = "#0072B2")) +
+    "Urbanization (%)" = "#78206E")) +
   theme(axis.text.x = element_text(colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
         axis.title.y = element_text(colour = "black", face = "plain", size = 12),
@@ -371,23 +411,26 @@ BDPlotCity <- ggplot(data = all_model_coefs[model_name == "BDCityFinal"],
         strip.text = element_blank())
 
 
+
+
+
+
+#
+
 blank_plot <- ggplot() + theme_void()
 
 #Put all plots together
-AB <- ggpubr::ggarrange(InvPlot, ConPlot, nrow = 1, widths = c(4,4.5))
-CD <- ggpubr::ggarrange(InvPlotCity, ConPlotCity, nrow = 1, widths = c(4,4.5))
-EFGH <- ggpubr::ggarrange(BDPlot, BDPlotCity, LopePlot, LopePlotCity, nrow = 1,
-                          widths = c(2,2,2,3))
-IJ <- ggpubr::ggarrange(SolvePlot, SolvePlotCity, blank_plot, nrow = 1,
-                          widths = c(2.5,2.5, 3))
 
-FinalPlot <- ggpubr::ggarrange(AB, CD, EFGH, IJ, nrow = 4)
-#ggsave("figures/Fig3.pdf", FinalPlot, width = 9, height = 11, dpi = 700,  bg = "white") 
+ABCDE <- ggpubr::ggarrange(SolvePlot, BDPlot, InvPlot, ConPlot, LopePlot, nrow = 5, heights = c(2,2,6,8, 2))
+FGHIJ <- ggpubr::ggarrange(SolvePlotCity, BDPlotCity, InvPlotCity, ConPlotCity, LopePlotCity, nrow = 5, heights = c(2,2,6,8,3))
+
+FinalPlot <- ggpubr::ggarrange(ABCDE, FGHIJ, ncol = 2)
+#ggsave("C:/Users/sager/OneDrive/Desktop/school/MSc/manuscripts/Science Cognition/PNAS_SUbmission/Fig3_Jan20.pdf", FinalPlot, width = 9, height = 14, dpi = 700,  bg = "white") 
 
 
 
 #You also need to save model information (summary and all that)
-#Build function to pull info out of glmmTMB models (thanks, Lundy!)-------------
+#Build function to pull info out of glmmTMB models----------
 tidy_glmmTMB <- function(m) {
   dt <- tidy(m, effects = "fixed", component = "cond", conf.int = TRUE) |> as.data.table()
   dt[, `:=`(
@@ -503,7 +546,7 @@ exp(confint(SolveCityFinal_unscaled))
 
 
 
-#Do interaction or disp formula terms improve final models (I hope not...)
+#Do interaction or disp formula terms improve final models 
 InvFinal1 <- glmmTMB(Inv_duration ~   Sex + PuzzleType + urbanization + Sex:urbanization +
                       (1|SiteID), ziformula = ~ ., family=lognormal(), data = dat)
 
@@ -530,7 +573,7 @@ LopeFinal1 <- glmmTMB(Lope ~ GroupSize_scaled + urbanization + urbanization:Grou
                        (1|SiteID), family=binomial(link = "logit"), data = dat)
 
 summary(InvFinal1)
-anova(InvFinal, InvFinal1) #NOOOOOOOOOOOOOOO Sex:Ubranization improved things. Fuck
+anova(InvFinal, InvFinal1)
 
 summary(InvFinal2)
 anova(InvFinal, InvFinal2)

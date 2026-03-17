@@ -1,6 +1,3 @@
-#Goal here is to use bits of Erick code (without destroying them) to complete what
-#I feel to be the logical progression of the analysis
-
 
 rm(list = ls())
 gc()
@@ -65,7 +62,7 @@ sub_guide_SA[, sig := ifelse(null_uni_p < 0.05, "yes", "no")]
 #I will also plot these
 
 
-#Build function to pull info out of glmmTMB models (thanks, Lundy!)-------------
+#Build function to pull info out of glmmTMB models-------------
 tidy_glmmTMB <- function(m) {
   # Extract both conditional and zero-inflation components
   cond_dt <- tidy(m, effects = "fixed", component = "cond", conf.int = TRUE) |> as.data.table()
@@ -216,17 +213,15 @@ summary_table_SA <- summary_table_SA[term != "(Intercept)"]
 #write.csv(summary_table_SA, "figures/EventModelInfo_UrbOnly_SensitivityAnalysis.csv")
 
 #BUTTTTTT your effect sizes are gonna be wrong for nat50 because they're scaled... SO ANNOYING
-#GROSSSSSSS
 
-
-#Dude, did that fuckign work?! What a world we live in!!!
 #write.csv(summary_table, "figures/EventModelInfo_UrbOnly.csv")
-#Well, it didn't print LRT results. So I just raw-dogged it. Dawged it? Sorry Lundy...
+
+#Well, it didn't print LRT results. So I just did it manually
 
 sub_guide$null_uni_p
 sub_guide[extent == "city"]
 
-#Check some of this manually because it does feel a touch dubious
+#Check some of this manually 
 a <- readRDS("builds/batch_models_july_2025/models/model_3381.Rds")
 b <- readRDS("builds/batch_models_july_2025/models/model_3453.Rds")
 
@@ -281,7 +276,7 @@ summary(d)
 confint(d)
 
 
-#Now I am going to plot these results, though they could be more riveting
+#Now I am going to plot these results
 #
 
 #You'll hav eto plot categorical dudes and continuous dudes separately
@@ -317,11 +312,12 @@ predicted_all <- rbindlist(
 
 #what are you going to call these dudes?
 label_map <- c(
+  "Solves"          = "Solutions",
+  "Behav_Complexity" = "Behavioural Diversity",
   "Inv_duration"    = "Exploration Duration (s)",
   "Contact_duration" = "Persistence (s)",
-  "Behav_Complexity" = "Behavioural Diversity",
-  "Lope"            = "Fearfulness",
-  "Solves"          = "Solutions"
+  "Lope"            = "Fearfulness"
+  
 )
 
 # get everything in correct order and such
@@ -330,14 +326,14 @@ predicted_all[, response_label := factor(response_label, levels = label_map)]
 predicted_all[, urbanization := factor(urbanization, levels = c("Wild", "City"))]
 
 # Plot
-CvPPlots <- ggplot(predicted_all, aes(x = urbanization, y = predicted, fill = urbanization)) +
+Contact1 <- ggplot(data = predicted_all[response_label == "Persistence (s)"], aes(x = urbanization, y = predicted, fill = urbanization)) +
   geom_col(position = position_dodge(width = 0.8), width = 0.6) +
   geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
   facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
-  scale_fill_manual(values = c("Wild" = "#56B4E9", "City" = "#0072B2")) +
+  scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
   theme_classic() +
   theme(
-    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.text = element_blank(),
     strip.background = element_blank(),
     axis.text.x = element_text(color = "black", size = 12),
     axis.text.y = element_text(color = "black", size = 12),
@@ -350,7 +346,609 @@ CvPPlots <- ggplot(predicted_all, aes(x = urbanization, y = predicted, fill = ur
     y = "Predicted Value"
   )
 
-CvPPlots
+Contact1
+
+# Plot
+Inv1 <- ggplot(data = predicted_all[response_label == "Exploration Duration (s)"], aes(x = urbanization, y = predicted, fill = urbanization)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+  facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
+  scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_blank(),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Predicted Value"
+  )
+
+Inv1
+
+# Plot
+BD1 <- ggplot(data = predicted_all[response_label == "Behavioural Diversity"], aes(x = urbanization, y = predicted, fill = urbanization)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+  facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
+  scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_blank(),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Predicted Value"
+  )
+
+BD1
+
+Lope1 <- ggplot(data = predicted_all[response_label == "Fearfulness"], aes(x = urbanization, y = predicted, fill = urbanization)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+  facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
+  scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_blank(),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Predicted Value"
+  )
+
+Lope1
+
+
+Solve1 <- ggplot(data = predicted_all[response_label == "Solutions"], aes(x = urbanization, y = predicted, fill = urbanization)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+  facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
+  scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_blank(),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Predicted Value"
+  )
+
+Solve1
+
+
+
+
+# >>> Alternative ---------------------------------------------------
+# Plot actual data summaries to enable meta-analysis and jitter points to impress
+dat2
+
+dat2.mlt <- melt(dat2,
+                 measure.vars = c("Contact_duration", "Inv_duration", "Behav_Complexity",
+                                  "Solves", "Lope"))
+dat2.mlt
+unique(dat2.mlt$value)
+#
+
+summaries <- dat2.mlt[, .(mean_val = mean(value, na.rm = T),
+                          sd_val = sd(value, na.rm = T)),
+                      by = .(variable, urbanization)]
+summaries[, ymax := mean_val + sd_val]
+summaries[, ymin := mean_val - sd_val]
+summaries[ymin < 0, ymin := 0]
+
+# Plot
+contactplot_full <- ggplot() +
+  # geom_boxplot()+
+  geom_jitter(data = dat2.mlt[variable == "Contact_duration"], 
+              aes(x = urbanization, y = (value), fill = urbanization),
+              position = position_jitter(width = .15, height = 0),
+              # stroke = 5,
+              shape = 21, alpha = .5, size = 3)+
+  geom_pointrange(data = summaries[variable == "Contact_duration"], 
+                  aes(x = urbanization, y = mean_val,
+                                        ymin = ymin, ymax = ymax,
+                                        fill = urbanization),
+                                  shape = 21,
+                                  lwd = 1,
+                                  stroke = 1,
+                                  size = 1.5)+
+  # geom_pointrange(data = predicted_all[response == "Contact_duration"],
+  #                 aes(x = urbanization, ymin = lower, ymax = upper,
+  #                     fill = urbanization,
+  #                     y = predicted),
+  #                 shape = 21,
+  #                 lwd = 1,
+  #                 stroke = 1,
+  #                 size = 1.5)+
+ # coord_cartesian(ylim = c(0, 75))+
+  # geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  # geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+  # facet_wrap(~ variable, scales = "free_y", ncol = 1) +
+  scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Mean Persistence (s)\n+/- SD"
+  )
+
+contactplot_full
+
+
+# Plot
+contactplot_reduced <- ggplot() +
+  # geom_boxplot()+
+  geom_jitter(data = dat2.mlt[variable == "Contact_duration"], 
+              aes(x = urbanization, y = (value), fill = urbanization),
+              position = position_jitter(width = .15, height = 0),
+              # stroke = 5,
+              shape = 21, alpha = .5, size = 3)+
+  geom_pointrange(data = summaries[variable == "Contact_duration"], 
+                  aes(x = urbanization, y = mean_val,
+                      ymin = ymin, ymax = ymax,
+                      fill = urbanization),
+                  shape = 21,
+                  lwd = 1,
+                  stroke = 1,
+                  size = 1.5)+
+  # geom_pointrange(data = predicted_all[response == "Contact_duration"],
+  #                 aes(x = urbanization, ymin = lower, ymax = upper,
+  #                     fill = urbanization,
+  #                     y = predicted),
+  #                 shape = 21,
+  #                 lwd = 1,
+  #                 stroke = 1,
+  #                 size = 1.5)+
+   coord_cartesian(ylim = c(0, 70))+
+  # geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  # geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+# facet_wrap(~ variable, scales = "free_y", ncol = 1) +
+scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Mean Persistence (s)\n+/- SD"
+  )
+
+contactplot_reduced
+
+# Plot (investigation)
+invplot_full <- ggplot() +
+  # geom_boxplot()+
+  geom_jitter(data = dat2.mlt[variable == "Inv_duration"], 
+              aes(x = urbanization, y = (value), fill = urbanization),
+              position = position_jitter(width = .15, height = 0),
+              # stroke = 5,
+              shape = 21, alpha = .5, size = 3)+
+  geom_pointrange(data = summaries[variable == "Inv_duration"], 
+                  aes(x = urbanization, y = mean_val,
+                      ymin = ymin, ymax = ymax,
+                      fill = urbanization),
+                  shape = 21,
+                  lwd = 1,
+                  stroke = 1,
+                  size = 1.5)+
+  # geom_pointrange(data = predicted_all[response == "Contact_duration"],
+  #                 aes(x = urbanization, ymin = lower, ymax = upper,
+  #                     fill = urbanization,
+  #                     y = predicted),
+  #                 shape = 21,
+  #                 lwd = 1,
+  #                 stroke = 1,
+  #                 size = 1.5)+
+  # coord_cartesian(ylim = c(0, 75))+
+  # geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  # geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+# facet_wrap(~ variable, scales = "free_y", ncol = 1) +
+scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Mean Exploration (s)\n+/- SD"
+  )
+
+invplot_full
+
+
+# Plot
+invplot_reduced <- ggplot() +
+  # geom_boxplot()+
+  geom_jitter(data = dat2.mlt[variable == "Inv_duration"], 
+              aes(x = urbanization, y = (value), fill = urbanization),
+              position = position_jitter(width = .15, height = 0),
+              # stroke = 5,
+              shape = 21, alpha = .5, size = 3)+
+  geom_pointrange(data = summaries[variable == "Inv_duration"], 
+                  aes(x = urbanization, y = mean_val,
+                      ymin = ymin, ymax = ymax,
+                      fill = urbanization),
+                  shape = 21,
+                  lwd = 1,
+                  stroke = 1,
+                  size = 1.5)+
+  # geom_pointrange(data = predicted_all[response == "Contact_duration"],
+  #                 aes(x = urbanization, ymin = lower, ymax = upper,
+  #                     fill = urbanization,
+  #                     y = predicted),
+  #                 shape = 21,
+  #                 lwd = 1,
+  #                 stroke = 1,
+  #                 size = 1.5)+
+  coord_cartesian(ylim = c(0, 110))+
+  # geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  # geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+  # facet_wrap(~ variable, scales = "free_y", ncol = 1) +
+  scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Mean Exploration (s)\n+/- SD"
+  )
+
+invplot_reduced
+
+
+
+# Plot (investigation)
+BDplot_full <- ggplot() +
+  # geom_boxplot()+
+  geom_jitter(data = dat2.mlt[variable == "Behav_Complexity"], 
+              aes(x = urbanization, y = (value), fill = urbanization),
+              position = position_jitter(width = .15, height = .3),
+              # stroke = 5,
+              shape = 21, alpha = .5, size = 3)+
+  geom_pointrange(data = summaries[variable == "Behav_Complexity"], 
+                  aes(x = urbanization, y = mean_val,
+                      ymin = ymin, ymax = ymax,
+                      fill = urbanization),
+                  shape = 21,
+                  lwd = 1,
+                  stroke = 1,
+                  size = 1.5)+
+  # geom_pointrange(data = predicted_all[response == "Contact_duration"],
+  #                 aes(x = urbanization, ymin = lower, ymax = upper,
+  #                     fill = urbanization,
+  #                     y = predicted),
+  #                 shape = 21,
+  #                 lwd = 1,
+  #                 stroke = 1,
+  #                 size = 1.5)+
+  # coord_cartesian(ylim = c(0, 75))+
+  # geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  # geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+# facet_wrap(~ variable, scales = "free_y", ncol = 1) +
+scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Mean Behavioural Diversity\n+/- SD"
+  )
+
+BDplot_full
+
+
+# Plot
+BDplot_reduced <- ggplot() +
+  # geom_boxplot()+
+  geom_jitter(data = dat2.mlt[variable == "Behav_Complexity"], 
+              aes(x = urbanization, y = (value), fill = urbanization),
+              position = position_jitter(width = .15, height = .15),
+              # stroke = 5,
+              shape = 21, alpha = .5, size = 3)+
+  geom_pointrange(data = summaries[variable == "Behav_Complexity"], 
+                  aes(x = urbanization, y = mean_val,
+                      ymin = ymin, ymax = ymax,
+                      fill = urbanization),
+                  shape = 21,
+                  lwd = 1,
+                  stroke = 1,
+                  size = 1.5)+
+  # geom_pointrange(data = predicted_all[response == "Contact_duration"],
+  #                 aes(x = urbanization, ymin = lower, ymax = upper,
+  #                     fill = urbanization,
+  #                     y = predicted),
+  #                 shape = 21,
+  #                 lwd = 1,
+  #                 stroke = 1,
+  #                 size = 1.5)+
+  coord_cartesian(ylim = c(1, 5))+
+  # geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  # geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+  # facet_wrap(~ variable, scales = "free_y", ncol = 1) +
+  scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Mean Behavioural Diversity\n+/- SD"
+  )
+
+BDplot_reduced
+
+#Happy with these reduced plots for the main text; put full in SI
+
+
+#Move on to binary chaps
+binary_variables <- dat2.mlt[variable%in% c("Solves", "Lope")]
+binary_variables[, total_tries := .N, by = .(variable, urbanization)]
+binary_variable_summary <- binary_variables[, .(total_events = sum(value)),
+                                            by = .(total_tries, variable, urbanization)]
+
+binary_variable_summary[, proportion := total_events / total_tries]
+binary_variable_summary
+
+SolvesPlot <- ggplot() +
+  # geom_boxplot()+
+  # geom_jitter(data = xxxxxx, 
+  #             aes(x = urbanization, y = (value), fill = urbanization),
+  #             position = position_jitter(width = .15, height = 0),
+  #             # stroke = 5,
+  #             shape = 21, alpha = .5, size = 3)+
+  geom_col(data = binary_variable_summary[variable == "Solves"], 
+                  aes(x = urbanization, y = proportion,
+                      fill = urbanization),
+                  shape = 21,
+                  lwd = 1,
+                  stroke = 1,
+                  size = 1.5)+
+  geom_text(data = binary_variable_summary[variable == "Solves"],
+            aes(x = urbanization, y = proportion + 0.005,
+                label = paste(total_events, "/", total_tries)))+
+  coord_cartesian(ylim = c(0, .06))+
+  scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Solve success rate"
+  )
+
+SolvesPlot
+
+LopePlot <- ggplot() +
+  # geom_boxplot()+
+  # geom_jitter(data = xxxxxx, 
+  #             aes(x = urbanization, y = (value), fill = urbanization),
+  #             position = position_jitter(width = .15, height = 0),
+  #             # stroke = 5,
+  #             shape = 21, alpha = .5, size = 3)+
+  geom_col(data = binary_variable_summary[variable == "Lope"], 
+           aes(x = urbanization, y = proportion,
+               fill = urbanization),
+           shape = 21,
+           lwd = 1,
+           stroke = 1,
+           size = 1.5)+
+  geom_text(data = binary_variable_summary[variable == "Lope"],
+            aes(x = urbanization, y = proportion + 0.005,
+                label = paste(total_events, "/", total_tries)))+
+#  coord_cartesian(ylim = c(0, .06))+
+  scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Fearfulness Rate"
+  )
+
+LopePlot
+
+
+#For SI, plot raw data
+Lopeplot_full <- ggplot() +
+  # geom_boxplot()+
+  geom_jitter(data = dat2.mlt[variable == "Lope"], 
+              aes(x = urbanization, y = (value), fill = urbanization),
+              position = position_jitter(width = .15, height = .2),
+              # stroke = 5,
+              shape = 21, alpha = .5, size = 3)+
+  geom_pointrange(data = summaries[variable == "Lope"], 
+                  aes(x = urbanization, y = mean_val,
+                      ymin = ymin, ymax = ymax,
+                      fill = urbanization),
+                  shape = 21,
+                  lwd = 1,
+                  stroke = 1,
+                  size = 1.5)+
+  # geom_pointrange(data = predicted_all[response == "Contact_duration"],
+  #                 aes(x = urbanization, ymin = lower, ymax = upper,
+  #                     fill = urbanization,
+  #                     y = predicted),
+  #                 shape = 21,
+  #                 lwd = 1,
+  #                 stroke = 1,
+  #                 size = 1.5)+
+  # coord_cartesian(ylim = c(0, 75))+
+  # geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  # geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+# facet_wrap(~ variable, scales = "free_y", ncol = 1) +
+scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Mean Fearfulness\n+/- SD"
+  )
+
+Lopeplot_full
+
+
+#For SI, plot raw data
+Solveplot_full <- ggplot() +
+  # geom_boxplot()+
+  geom_jitter(data = dat2.mlt[variable == "Solves"], 
+              aes(x = urbanization, y = (value), fill = urbanization),
+              position = position_jitter(width = .15, height = .2),
+              # stroke = 5,
+              shape = 21, alpha = .5, size = 3)+
+  geom_pointrange(data = summaries[variable == "Solves"], 
+                  aes(x = urbanization, y = mean_val,
+                      ymin = ymin, ymax = ymax,
+                      fill = urbanization),
+                  shape = 21,
+                  lwd = 1,
+                  stroke = 1,
+                  size = 1.5)+
+  # geom_pointrange(data = predicted_all[response == "Contact_duration"],
+  #                 aes(x = urbanization, ymin = lower, ymax = upper,
+  #                     fill = urbanization,
+  #                     y = predicted),
+  #                 shape = 21,
+  #                 lwd = 1,
+  #                 stroke = 1,
+  #                 size = 1.5)+
+  # coord_cartesian(ylim = c(0, 75))+
+  # geom_col(position = position_dodge(width = 0.8), width = 0.6) +
+  # geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2, position = position_dodge(0.8)) +
+# facet_wrap(~ variable, scales = "free_y", ncol = 1) +
+scale_fill_manual(values = c("Wild" = "#FDC213", "City" = "#78206E")) +
+  theme_classic() +
+  theme(
+    strip.text = element_text(hjust = 0, face = "plain", size = 12),
+    strip.background = element_blank(),
+    axis.text.x = element_text(color = "black", size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    axis.title.x = element_text(color = "black", size = 12),
+    axis.title.y = element_text(color = "black", size = 12),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization Category",
+    y = "Mean Solutions\n+/- SD"
+  )
+
+Solveplot_full
+
+
+
+#Conbine the 5 SI plots
+A <- arrangeGrob(Solve1, Solveplot_full, nrow = 1, widths = c(2,3))
+grid::grid.draw(A)
+
+B <- arrangeGrob(Inv1, invplot_full, nrow = 1, widths = c(2,3))
+grid::grid.draw(B)
+
+C <- arrangeGrob(Contact1, contactplot_full, nrow = 1, widths = c(2,3))
+grid::grid.draw(C)
+
+D <- arrangeGrob(BD1, BDplot_reduced, nrow = 1, widths = c(2,3))
+grid::grid.draw(D)
+
+E <- arrangeGrob(Lope1, Lopeplot_full, nrow = 1, widths = c(2,3))
+grid::grid.draw(E)
+
+
+FinalSIPlot <- arrangeGrob(A, D, B, C, E, ncol = 1)
+grid::grid.draw(FinalSIPlot)
+
+ggsave("C:/Users/sager/OneDrive/Desktop/school/MSc/manuscripts/Science Cognition/PNAS_SUbmission/FigS1_Jan20.pdf", FinalSIPlot, width = 7, height = 10, dpi = 700,  bg = "white") 
+
+
+
+
+#Combine with cvplots and then save
+FinalSIPlots <- ggarrange(CvPPlots, SI_plots, ncol = 2)
+
 
 #City only plots---------------------------------------------------------------
 
@@ -390,11 +988,11 @@ model_list <- list(d = d,
 
 
 label_map <- c(
+  f = "Solutions",
+  g = "Behavioural Diversity",
   d = "Exploration Duration (s)",
   c = "Persistence (s)",
-  g = "Behavioural Diversity",
-  e = "Fearfulness",
-  f = "Solutions"
+  e = "Fearfulness"
 )
 
 
@@ -406,10 +1004,178 @@ predicted_cont[, response_label := factor(response_label, levels = label_map)]
 
 
 # Plot
-CityPlots <- ggplot(predicted_cont, aes(x = Nat50, y = predicted)) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#56B4E9", alpha = 0.2) +
-  geom_line(color = "#0072B2", size = 1) +
+SolveCity <- ggplot(predicted_cont[response_label == "Solutions"], aes(x = Nat50, y = predicted)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#9F4E4A", alpha = 0.2) +
+  geom_line(color = "#78206E", size = 1) +
   facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
+  theme_classic() +
+  theme(
+    strip.text = element_blank(),
+    strip.background = element_blank(),
+    axis.text = element_text(colour = "black", size = 12),
+    axis.title = element_text(colour = "black", size = 12),
+    axis.text.x = element_text(colour = "black", face = "plain", size = 12),
+    axis.text.y = element_text(colour = "black", face = "plain", size = 12),
+    axis.title.x = element_text(colour = "black", face = "plain", size = 12),
+    axis.title.y = element_text(colour = "black", face = "plain", size = 12),
+    legend.text = element_text(colour = "black", face = "plain", size = 12),
+    legend.title = element_blank(),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization (City sites only; %)",
+    y = "Predicted Value"
+  )
+
+
+
+LopeCity <- ggplot(predicted_cont[response_label == "Fearfulness"], aes(x = Nat50, y = predicted)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#9F4E4A", alpha = 0.2) +
+  geom_line(color = "#78206E", size = 1) +
+  facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
+  theme_classic() +
+  theme(
+    strip.text = element_blank(),
+    strip.background = element_blank(),
+    axis.text = element_text(colour = "black", size = 12),
+    axis.title = element_text(colour = "black", size = 12),
+    axis.text.x = element_text(colour = "black", face = "plain", size = 12),
+    axis.text.y = element_text(colour = "black", face = "plain", size = 12),
+    axis.title.x = element_text(colour = "black", face = "plain", size = 12),
+    axis.title.y = element_text(colour = "black", face = "plain", size = 12),
+    legend.text = element_text(colour = "black", face = "plain", size = 12),
+    legend.title = element_blank(),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization (City sites only; %)",
+    y = "Predicted Value"
+  )
+
+InvCity <- ggplot(predicted_cont[response_label == "Exploration Duration (s)"], aes(x = Nat50, y = predicted)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#9F4E4A", alpha = 0.2) +
+  geom_line(color = "#78206E", size = 1) +
+  facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
+  theme_classic() +
+  theme(
+    strip.text = element_blank(),
+    strip.background = element_blank(),
+    axis.text = element_text(colour = "black", size = 12),
+    axis.title = element_text(colour = "black", size = 12),
+    axis.text.x = element_text(colour = "black", face = "plain", size = 12),
+    axis.text.y = element_text(colour = "black", face = "plain", size = 12),
+    axis.title.x = element_text(colour = "black", face = "plain", size = 12),
+    axis.title.y = element_text(colour = "black", face = "plain", size = 12),
+    legend.text = element_text(colour = "black", face = "plain", size = 12),
+    legend.title = element_blank(),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization (City sites only; %)",
+    y = "Predicted Duration"
+  )
+
+ConCity <- ggplot(predicted_cont[response_label == "Persistence (s)"], aes(x = Nat50, y = predicted)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#9F4E4A", alpha = 0.2) +
+  geom_line(color = "#78206E", size = 1) +
+  facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
+  theme_classic() +
+  theme(
+    strip.text = element_blank(),
+    strip.background = element_blank(),
+    axis.text = element_text(colour = "black", size = 12),
+    axis.title = element_text(colour = "black", size = 12),
+    axis.text.x = element_text(colour = "black", face = "plain", size = 12),
+    axis.text.y = element_text(colour = "black", face = "plain", size = 12),
+    axis.title.x = element_text(colour = "black", face = "plain", size = 12),
+    axis.title.y = element_text(colour = "black", face = "plain", size = 12),
+    legend.text = element_text(colour = "black", face = "plain", size = 12),
+    legend.title = element_blank(),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization (City sites only; %)",
+    y = "Predicted Duration"
+  )
+
+
+BDCity <- ggplot(predicted_cont[response_label == "Behavioural Diversity"], aes(x = Nat50, y = predicted)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#9F4E4A", alpha = 0.2) +
+  geom_line(color = "#78206E", size = 1) +
+  facet_wrap(~ response_label, scales = "free_y", ncol = 1) +
+  theme_classic() +
+  theme(
+    strip.text = element_blank(),
+    strip.background = element_blank(),
+    axis.text = element_text(colour = "black", size = 12),
+    axis.title = element_text(colour = "black", size = 12),
+    axis.text.x = element_text(colour = "black", face = "plain", size = 12),
+    axis.text.y = element_text(colour = "black", face = "plain", size = 12),
+    axis.title.x = element_text(colour = "black", face = "plain", size = 12),
+    axis.title.y = element_text(colour = "black", face = "plain", size = 12),
+    legend.text = element_text(colour = "black", face = "plain", size = 12),
+    legend.title = element_blank(),
+    legend.position = "none"
+  ) +
+  labs(
+    x = "Urbanization (City sites only; %)",
+    y = "Predicted Value"
+  )
+
+
+
+#Conbine the 5 SI plots
+A <- arrangeGrob(SolvesPlot, SolveCity, nrow = 1, widths = c(2,2))
+grid::grid.draw(A)
+
+B <- arrangeGrob(invplot_reduced, InvCity, nrow = 1, widths = c(2,2))
+grid::grid.draw(B)
+
+C <- arrangeGrob(contactplot_reduced, ConCity, nrow = 1, widths = c(2,2))
+grid::grid.draw(C)
+
+D <- arrangeGrob(BDplot_reduced, BDCity, nrow = 1, widths = c(2,2))
+grid::grid.draw(D)
+
+E <- arrangeGrob(LopePlot, LopeCity, nrow = 1, widths = c(2,2))
+grid::grid.draw(E)
+
+
+FinalMTPlot <- arrangeGrob(A, D, B, C, E, ncol = 1)
+grid::grid.draw(FinalMTPlot)
+
+#ggsave("C:/Users/sager/OneDrive/Desktop/school/MSc/manuscripts/Science Cognition/PNAS_SUbmission/Fig2_Jan20.pdf", FinalMTPlot, width = 7, height = 10, dpi = 700,  bg = "white") 
+
+
+
+#Combine plots
+SitePlots <- ggarrange(CvPPlots, CityPlots, ncol = 2)
+#ggsave("C:/Users/sager/OneDrive/Desktop/school/MSc/manuscripts/Science Cognition/PNAS_SUbmission/FigS1_Jan20.pdf", SitePlots, width = 6, height = 7.5, dpi = 700,  bg = "white") 
+
+
+# >>> Lundy alternative ---------------------------------------------------
+
+dat2
+
+#data = dat2, aes(x = Nat50, y = Contact_duration)
+unique(predicted_cont$response)
+ggplot()+
+  # geom_smooth(data = dat2, aes(x = Nat50, y = Contact_duration),
+  #             color = "black",
+  #             method = "glm")+
+  geom_ribbon(data = predicted_cont[response_label == "Persistence (s)"],
+              aes(ymin = lower, ymax = upper, x = Nat50),
+              fill = "grey60", alpha = 0.2) +
+  geom_line(data = predicted_cont[response_label == "Persistence (s)"],
+            aes(y = predicted, x = Nat50),
+  color = "black", size = 1) +
+  geom_jitter(data = dat2,
+              aes(x = Nat50, y = Contact_duration, 
+                  fill = Nat50),
+              size = 3,
+              alpha = .5, shape = 21)+
+  scale_fill_gradient(low = "goldenrod", high = "orchid")+
+  coord_cartesian(ylim = c(0, 10))+
   theme_classic() +
   theme(
     strip.text = element_text(hjust = 0, face = "plain", size = 12),
@@ -428,13 +1194,6 @@ CityPlots <- ggplot(predicted_cont, aes(x = Nat50, y = predicted)) +
     x = "Urbanization (%)",
     y = "Predicted Count"
   )
-
-
-
-
-#Combine plots
-SitePlots <- ggarrange(CvPPlots, CityPlots, ncol = 2)
-#ggsave("figures/Fig2.pdf", SitePlots, width = 6, height = 9, dpi = 700,  bg = "white") 
 
 
 

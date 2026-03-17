@@ -66,13 +66,6 @@ guide
 #
 setdiff(guide$var, names(dat))
 #' [The scaled variables will be returned here. They need to be scaled on the fly]
-#' [How to write this in dplyr:]
-# guide <- expand.grid(response = c("persistence", "play", "stupidity", "happy", "hoho"),
-#                      var = c("urbanization", "temperature", "darkness", 
-#                              "brightness", "loveliness",
-#                              "cityfulness"),
-#                      location_or_scale = c("location", "location_scale"))
-# guide
 
 # >>> Create formulas -----------------------------------------------------
 
@@ -130,33 +123,7 @@ guide[, model_complexity_comparison_ID := paste0("model_complexity_id_",
 guide[model_complexity_comparison_ID == "model_complexity_id_96"]
 
 # >>> Add an exclusion formula to make sure models are comparable --------------------------------------------------
-#I AM WORRIED I DID THIS WRONG AND IT IS FUCKING EVERYTHING UP
-#' [hahaha yes i'm sure I'll fuck it up too. I'm too dumb to understand the regex in your sub command...let me see what happens..]
-#the goal here is to make a column that IDs the models that should be compared
-#this is logical--one null + one univariate + one urbanization model
-#the location scale part is something I don't know how to do. 
-#I think I could get this just by kind of pasting the resp var + pred + 
-
-#I am breaking this into multiple steps because JANK
-# Make a new column that pulls urbanization variable name from urbanization_formula column
-# guide[, urb_var := sub(".*\\+\\s*([^_\\s]+)(?:_scaled)?", "\\1", urbanization_formula)]
-#success 
-
-#create exclusion string?? I hope!!!
-# guide[, exclusion := paste0(
-#   "complete.cases(",
-#   response, ", ",
-#   gsub("_scaled", "", var), ", ",
-#   urb_var,
-#   ifelse(subject_id == "yes", ", Subject", ""),
-#   ")"
-# )]
-
-
-#This is Erick's old code... THAT GUY
-#' [HAHA]
-#' 
-#' [ERICK AGAIN, once again being an annoying PIA]
+#Old code
 
 guide[, exclusion := paste0("complete.cases(",
                             var, 
@@ -207,7 +174,7 @@ guide.long
 guide.long 
 
 if(nrow(guide.long[, .(n = .N), by = .(location_scale_model_comparison_ID)][n != 2, ]) > 0){
-  print("You're a fucking piece of shit")
+  print("Oops, bummer")
 }
 
 guide.long[, .(n = .N), by = .(location_scale_model_comparison_ID)][n != 2, ]
@@ -243,15 +210,6 @@ guide.long[location_or_scale == "location_scale", dispformula := gsub(response, 
 unique(guide.long[location_or_scale == "location_scale",]$dispformula)
 # That should do.
 
-# Stupid earlier approach
-# guide.long[location_or_scale == "location_scale", 
-#            dispformula := paste("~", var)]
-# 
-# guide.long[location_or_scale == "location_scale" & model_type == "urbanization" &
-#              !var %in% c("urbanization", "urbanization_score"), 
-#            dispformula := paste(dispformula, "+", ifelse(extent == "city_and_park",
-#                                                          "urbanization", "urbanization_score"))]
-# 
 
 # >>> Add random effects to formulas --------------------------------------
 guide.long[subject_id == "yes", formula := paste0(formula, " + (1|SiteID/Subject)")]

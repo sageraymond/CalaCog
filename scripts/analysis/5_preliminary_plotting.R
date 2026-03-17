@@ -3,8 +3,8 @@ rm(list = ls())
 gc()
 
 # Groundhog makes libraries consistent.
-library("groundhog")
-groundhog.day <- "2025-04-15"
+library("pacman")
+# groundhog.day <- "2025-04-15"
 libs <- c("metafor", "broom", "broom.mixed",
           "data.table",
           "ggplot2", "tidyr", "multcomp",
@@ -12,12 +12,17 @@ libs <- c("metafor", "broom", "broom.mixed",
           "glmmTMB",
           "cpp11", "withr", "colorspace", "mvtnorm",
           "foreach", "doSNOW")
-groundhog.library(libs, groundhog.day)
+pacman::p_load(libs)
+library("data.table")
+library("broom")
+library("broom.mixed")
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -------------------------------------
 # 0. Load data and guide --------------------------------------------------
 
 master_guide <- readRDS("builds/batch_models_july_2025/model_guide_with_comparison_stats.Rds")
+setDT(master_guide)
 
 dat <- readRDS("builds/prepared_dataset.Rds")
 dat
@@ -90,8 +95,7 @@ pred_glmmTMB <- function(m, newgrid){
 sub_guide <- master_guide[var %in% c("urbanization")]
 sub_guide
 
-#' [You understand lapply right? It took me forever to understand it.]
-#' *it's basically a compact for loop. It applies the 'FUN' for each element in the first argument 
+#' *Lapply is basically a compact for loop. It applies the 'FUN' for each element in the first argument 
 ms <- lapply(sub_guide$model_path_univariate,
                       FUN=readRDS)
 ms.tidy <- lapply(ms,
@@ -103,7 +107,6 @@ ms.tidy <- rbindlist(ms.tidy, idcol = "model_id_univariate")
 ms.tidy
 # The random effect parameters are NA for CIs because I didn't feel like munging the text...
 
-#' [You could do this for ALL models and put them all in a giant supplementary table. If you felt like that.]
 
 #
 ms.tidy <- ms.tidy[effect != "ran_pars"]
@@ -142,7 +145,7 @@ ggplot()+
         panel.grid = element_blank(),
         panel.border = element_blank())
   
-#' [There's an issue with GIANT CIs for Solves and Wild...Hmmmm. Might need to do some investigation]
+#' [There's an issue with GIANT CIs for Solves and Wild... this is because all solutions occurred in te city]
 
 # ziformulas:
 ggplot()+
@@ -167,7 +170,7 @@ sub_guide <- master_guide[model_id_urbanization == "model_7363"]
 m <- readRDS(sub_guide$model_path_urbanization)
 summary(m)
 
-# Having scaled variables is so fucking annoying. That's one thing here...Goddamnit
+# Having scaled variables is so  annoying. That's one thing 
 sub_dat <- dat[eval(parse(text = sub_guide$exclusion)), ]
 sub_dat[, pop_density_scaled := scale(pop_density)]
 sub_dat
@@ -203,4 +206,4 @@ p <- ggplot()+
 p
 
 p + coord_cartesian(ylim = c(0, 5))
-# Hmmm. Hahah. Not a very pretty one lol. But hopefully you can use this code?
+#^example plot

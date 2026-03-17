@@ -1,7 +1,3 @@
-#Goal here is STILL to use bits of Erick code (without destroying them) to complete what
-#I feel to be the logical progression of the analysis
-
-
 rm(list = ls())
 gc()
 
@@ -50,7 +46,7 @@ Solve <- glmmTMB(Solves ~ Sex +
 
 #Let's pull out all of their info, plus make some coefficient plots for them
 
-#Build function to pull info out of glmmTMB models (thanks, Lundy!)-------------
+#Build function to pull info out of glmmTMB models-------------
 tidy_glmmTMB <- function(m) {
   # Extract both conditional and zero-inflation components
   cond_dt <- tidy(m, effects = "fixed", component = "cond", conf.int = TRUE) |> as.data.table()
@@ -198,7 +194,7 @@ summary_table <- summary_table[term != "(Intercept)"]
 
 
 #And plot them
-#Not snazzy or sexy but just do it manually for everyone
+#Not snazzy  but just do it manually for everyone
 coef_Inv <- tidy(Inv, effects = "fixed", conf.int = TRUE) |> as.data.table()
 
 cond_coefs_Inv <- coef_Inv[component == "cond"]
@@ -227,14 +223,16 @@ coef_Solve <- tidy(Solve, effects = "fixed", conf.int = TRUE) |> as.data.table()
 all_coefs_Inv <- all_coefs_Inv[term != "(Intercept)"]
 all_coefs_Inv$term <- ifelse(all_coefs_Inv$term == "SexM", "Male", "Wood Puzzle")
 
-InvPlot <- ggplot(all_coefs_Inv, aes(x = term, y = estimate, color = "tomato")) +
-  geom_point(position = position_dodge(width = 0.5), size = 5) +
+InvPlot <- ggplot(all_coefs_Inv, aes(x = term, y = estimate)) +
+  geom_point(position = position_dodge(width = 0.5), size = 5,
+             color = "#84828f") +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
-                width = 0.2, position = position_dodge(width = 0.5), size = 1) +
+                width = 0.2, position = position_dodge(width = 0.5), size = 1,
+                color = "#84828f") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   facet_wrap(~part, scales = "free_x") +
   theme_classic() +
-  labs(title = "A. Exploration Duration",
+  labs(title = "B. Exploration Duration",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
@@ -253,10 +251,12 @@ all_coefs_Con$term <- ifelse(all_coefs_Con$term == "LightL", "Daylight", all_coe
 all_coefs_Con$term <- ifelse(all_coefs_Con$term == "Year2025", "Second Year", all_coefs_Con$term)
 all_coefs_Con$term <- ifelse(all_coefs_Con$term == "PuzzleTypeW", "Wood Puzzle", all_coefs_Con$term)
 
-ConPlot <- ggplot(all_coefs_Con, aes(x = term, y = estimate, color = "tomato")) +
-  geom_point(position = position_dodge(width = 0.5), size = 5) +
+ConPlot <- ggplot(all_coefs_Con, aes(x = term, y = estimate)) +
+  geom_point(position = position_dodge(width = 0.5), size = 5 ,
+             color = "#84828f") +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
-                width = 0.2, position = position_dodge(width = 0.5), size = 1) +
+                width = 0.2, position = position_dodge(width = 0.5), size = 1,
+                color = "#84828f") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   facet_wrap(~part, scales = "free_x") +
   theme_classic() +
@@ -273,14 +273,16 @@ ConPlot <- ggplot(all_coefs_Con, aes(x = term, y = estimate, color = "tomato")) 
 #Plot Lope-------------------------------------------------------------------
 coef_Lope <- coef_Lope[term != "(Intercept)"]
 coef_Lope$term <- ifelse(coef_Lope$term == "GroupSize", "Group Size", coef_Lope$term)
-LopePlot <- ggplot(coef_Lope, aes(x = term, y = estimate, color = "tomato")) +
-  geom_point(position = position_dodge(width = 0.5), size =5) +
+LopePlot <- ggplot(coef_Lope, aes(x = term, y = estimate)) +
+  geom_point(position = position_dodge(width = 0.5), size =5,
+             color = "#84828f") +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
-                width = 0.2, position = position_dodge(width = 0.5), size = 1) +
+                width = 0.2, position = position_dodge(width = 0.5), size = 1,
+                color = "#84828f") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   #facet_wrap(~part, scales = "free_x") +
   theme_classic() +
-  labs(title = "B. Fearfulness",
+  labs(title = "D. Fearfulness",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
@@ -294,14 +296,16 @@ LopePlot <- ggplot(coef_Lope, aes(x = term, y = estimate, color = "tomato")) +
 coef_Solve <- coef_Solve[term != "(Intercept)"]
 coef_Solve$term <- ifelse(coef_Solve$term == "SexM", "Male", coef_Solve$term)
 
-SolvePlot <- ggplot(coef_Solve, aes(x = term, y = estimate, color = "tomato")) +
-  geom_point(position = position_dodge(width = 0.5), size =5) +
+SolvePlot <- ggplot(coef_Solve, aes(x = term, y = estimate)) +
+  geom_point(position = position_dodge(width = 0.5), size =5,
+             color = "#84828f") +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
-                width = 0.2, position = position_dodge(width = 0.5), size = 1) +
+                width = 0.2, position = position_dodge(width = 0.5), size = 1,
+                color = "#84828f") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   #facet_wrap(~part, scales = "free_x") +
   theme_classic() +
-  labs(title = "D. Solution",
+  labs(title = "A. Solution",
        y = "Coefficient Estimate", x = "Predictor", color = "Model Part") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, colour = "black", face = "plain", size = 12),
         axis.text.y = element_text(colour = "black", face = "plain", size = 12),
@@ -313,8 +317,15 @@ SolvePlot <- ggplot(coef_Solve, aes(x = term, y = estimate, color = "tomato")) +
 
 
 #Put all plots together
-FinalPlot <- ggarrange(InvPlot, LopePlot, ConPlot, SolvePlot, nrow = 2, widths = c(5,3))
-#ggsave("figures/FigS2.pdf", FinalPlot, width = 8, height = 6, dpi = 700,  bg = "white") 
+library(gridExtra)
+
+FinalPlota <- arrangeGrob(SolvePlot, InvPlot, nrow = 1, widths = c(3,5))
+FinalPlotb <- arrangeGrob(ConPlot, LopePlot, nrow = 1, widths = c(5,3))
+
+FinalPlot <- arrangeGrob(FinalPlota, FinalPlotb, nrow = 2)
+grid::grid.draw(FinalPlot)
+
+#ggsave("C:/Users/sager/OneDrive/Desktop/school/MSc/manuscripts/Science Cognition/PNAS_SUbmission/FigS3_Jan20.pdf", FinalPlot, width = 7, height = 7.5, dpi = 700,  bg = "white") 
 
 
 

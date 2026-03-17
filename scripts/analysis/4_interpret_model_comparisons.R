@@ -76,8 +76,8 @@ sub_guide[sensitivity_analysis == "orients" &
             subject_id == "yes", .(response, var, extent, sig)]
 
 #' [Results seem pretty robust.]
-#' *but the problem with this entire approach is interpreting so many fucking models.*
-#' *what have we done my buddy*
+#' *but the problem with this entire approach is interpreting so many models.*
+
 
 
 
@@ -112,7 +112,7 @@ uni_urban_guide[comp_conclusion != "uni_NOT_sig",
                   uni_urban_p = paste(round(range(uni_urban_p), 8), collapse = ", ")),
                 by = .(comp_conclusion,extent, sensitivity_analysis, subject_id)]
 
-#' [OK, so urbanization almost always improves model quality in city_and_park]
-#' [but is not as influential when in the city.]
+#' [OK, so urbanization  always improves model quality in city_and_park]
+
 
 

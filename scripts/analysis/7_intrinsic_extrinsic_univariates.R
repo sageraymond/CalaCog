@@ -85,7 +85,7 @@ sub_guide_SA[, sig := ifelse(null_uni_p < 0.05, "yes", "no")]
 
 #Now I am going to extract info from all of these so I can put it in a big ugly table
 
-#Build function to pull info out of glmmTMB models (thanks, Lundy!)-------------
+#Build function to pull info out of glmmTMB models----------
 tidy_glmmTMB <- function(m) {
   # Extract both conditional and zero-inflation components
   cond_dt <- tidy(m, effects = "fixed", component = "cond", conf.int = TRUE) |> as.data.table()
@@ -320,7 +320,7 @@ confint(a)
 
 
 
-# Get unscaled stuff. So freakin annoying
+# Get unscaled stuff. So annoying
 dat2 <- dat[Orient == "Y"] #new df that has unscaled variables
 
 #ID models you want to do this for

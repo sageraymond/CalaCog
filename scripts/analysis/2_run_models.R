@@ -49,7 +49,6 @@ guide[location_or_scale == "location_scale"]$model_call
 guide[location_or_scale == "location_scale" & zero_inflation == "yes"]$model_call
 
 #' [Year wants to be treated categorically, not continuously]
-#' *We wouldn't hypothesize a linear relationship to year would we?*
 dat[, Year := as.factor(Year)]
 unique(dat$Sex)
 dat$Sex <- ifelse(dat$Sex == "SF", "F", dat$Sex)
@@ -152,7 +151,7 @@ eval(parse(text = working_guide[2, ]$model_call))
 
 
 # >>> Screen model objects that didn't converge ---------------------------
-#' [didn't do this before...but should have ]
+
 m$pdHess
 
 m <- readRDS(guide[1, ]$model_path)
@@ -170,7 +169,7 @@ for(i in 1:nrow(guide)){
 #' *should have done this in the loop above...Next time...*
 guide[model_converged == FALSE, ]
 
-# Well that's good news. I hope it's real hahaha
+# Well that's good news. Everybody ran!!
 
 # >>> Parallel version ---------------------------------------------------
 # Having a weird problem I've never had before: not finding objects in global environment...

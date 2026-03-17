@@ -100,9 +100,8 @@ city_guide[grepl("urbanization", univariate_formula),
 
 #So, that fixed the univariate column. Now I need to do the same with the urbanization column
 #I need to substitute 'urbanization' with what would have been urbanization_score
-#But now it's 7 different things. what was i thinking???
 
-#Janky, but this should work
+#This should work
 # ID rows that contain 'urbanization' in the urb formula column
 rows <- guide[grepl("urbanization", urbanization_formula)]
 
@@ -177,13 +176,11 @@ guide[, model_complexity_comparison_ID := paste0("model_complexity_id_",
 guide[model_complexity_comparison_ID == "model_complexity_id_96"]
 
 # >>> Add an exclusion formula to make sure models are comparable --------------------------------------------------
-#I AM WORRIED I DID THIS WRONG AND IT IS FUCKING EVERYTHING UP
 #the goal here is to make a column that IDs the models that should be compared
 #this is logical--one null + one univariate + one urbanization model
-#the location scale part is something I don't know how to do. 
 #I think I could get this just by kind of pasting the resp var + pred + 
 
-#I am breaking this into multiple steps because JANK
+#I am breaking this into multiple steps 
 # Make a new column that pulls urbanization variable name from urbanization_formula column
 guide[, urb_var := sub(".*\\+\\s*([^_\\s]+)(?:_scaled)?", "\\1", urbanization_formula)]
 #success 
@@ -198,15 +195,6 @@ guide[, exclusion := paste0(
   ")"
 )]
 
-
-#This is Erick's old code... THAT GUY
-# >>> Add an exclusion formula to make sure models are comparable --------------------------------------------------
-#guide[, exclusion := paste0("complete.cases(", 
- #                           response, ", ", 
-  #                          gsub("_scaled", "", var), ", ", 
-   #                         ifelse(extent == "city", "urbanization_score", "urbanization"),
-    #                        ifelse(subject_id == "yes", ", Subject", ""),
-     #                       ")")]
 
 
 guide[sensitivity_analysis == "orients", exclusion := paste(exclusion, "& Orient == 'Y'")]
@@ -244,7 +232,7 @@ guide.long
 guide.long 
 
 if(nrow(guide.long[, .(n = .N), by = .(location_scale_model_comparison_ID)][n != 2, ]) > 0){
-  print("You're a fucking piece of shit")
+  print("I goofed!!!")
 }
 
 guide.long[, .(n = .N), by = .(location_scale_model_comparison_ID)][n != 2, ]

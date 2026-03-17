@@ -1,7 +1,3 @@
-#Goal here is STILL to use bits of Erick code (without destroying them) to complete what
-#I feel to be the logical progression of the analysis
-
-
 rm(list = ls())
 gc()
 

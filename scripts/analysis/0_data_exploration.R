@@ -35,9 +35,7 @@ unique(guide$response)
 hist(dat$Behav_Complexity)
 unique(dat$Behav_Complexity)
 # ooooooo
-# Is this ordinal?
 guide[response == "Behav_Complexity"]
-#' [Need to chat with you about what this is. Some kind of dirty index eh? ]
 
 m <- glmmTMB(Behav_Complexity ~ urbanization + (1|SiteID),
              data = dat,
@@ -47,7 +45,7 @@ summary(m)
 resids <- DHARMa::simulateResiduals(m)
 plot(resids)
 # Wow, that's actually not bad at all. 
-# Though I guess it says it is?
+
 
 
 m.disp <- glmmTMB(Behav_Complexity ~ urbanization + (1|SiteID),
@@ -70,9 +68,9 @@ guide[response == "Contact_duration"]
 m <- glmmTMB(Contact_duration ~ urbanization + (1|SiteID),
              data = dat,
              family = Gamma())
-# Non-posiitive???
+
 dat[Contact_duration < 0, ] 
-# wtf
+
 
 dat[Contact_duration == 0, ]
 m <- glmmTMB(Contact_duration ~ urbanization + (1|SiteID),
@@ -82,11 +80,9 @@ m <- glmmTMB(Contact_duration ~ urbanization + (1|SiteID),
 summary(m)
 
 # Duration is not significantly differnet in the wild, but number of 0s is. Cool zinflation for the win.
-#' [That's promising!!! Yeehaw]
+#' [That's promising!!! ]
 resids <- DHARMa::simulateResiduals(m)
 plot(resids)
-# Wow, that's actually not bad at all. 
-# Though I guess it says it is?
 
 
 m.disp <- glmmTMB(Contact_duration ~ urbanization + (1|SiteID),
@@ -110,7 +106,6 @@ dat[Inv_duration < 0, ]
 m <- glmmTMB(Inv_duration ~ urbanization + (1|SiteID),
              data = dat,
              family = Gamma())
-# Non-posiitive??? LIES
 
 dat[Inv_duration == 0, ]
 m <- glmmTMB(Inv_duration ~ urbanization + (1|SiteID),
@@ -135,9 +130,7 @@ summary(m.disp) #
 summary(m)
 
 # >>> Lope ----------------------------------------------------
-#' [Lope eh? I love loping]
 hist(dat$Lope)
-# Nope lol.
 
 unique(dat$Lope)
 
@@ -147,11 +140,11 @@ m <- glmmTMB(Lope ~ urbanization + (1|SiteID),
              family = binomial(link = "logit"))
 m
 summary(m)
-# Sick. 
+# easy 
 
 resids <- DHARMa::simulateResiduals(m)
 plot(resids)
-# Looks good. Also, do you even need to worry about heteroscedascititytytytyt with binomial?
+# Looks good. 
 
 m.disp <- glmmTMB(Lope ~ urbanization + (1|SiteID),
                   dispformula = ~ urbanization,
@@ -173,7 +166,7 @@ guide[response == "Solves"]
 m <- glmmTMB(Solves ~ urbanization + (1|SiteID),
              data = dat,
              family = binomial(link = "logit"))
-summary(m) #' [Why isn't that significantly different? Is the p value there for Wild testing if different than 0 or if different than Intercept? I'm a big dumb dumb]
+summary(m) #' 
 confint(m)
 
 library("multcomp")
