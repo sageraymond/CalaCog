@@ -1,0 +1,15 @@
+Extent,Predictor,N,Observed,Expected,SD,P,order
+All sites,Solutions,1156,0.005,-0.022,0.048,0.568,1
+All sites,Behavioural diversity,231,-0.045,-0.036,0.054,0.870,2
+All sites,Investigate,1156,-0.061,-0.022,0.048,0.427,3
+All sites,Investigate duration,486,-0.027,-0.029,0.050,0.956,4
+All sites,Contact,1156,-0.011,-0.022,0.048,0.817,5
+All sites,Contact duration,231,-0.122,-0.036,0.054,0.110,6
+All sites,Escape gait,1156,-0.066,-0.022,0.048,0.361,7
+City sites,Solutions,996,-0.075,-0.034,0.049,0.403,1
+City sites,Behavioural diversity,220,-0.123,-0.045,0.052,0.137,2
+City sites,Investigate,996,-0.034,-0.034,0.049,0.994,3
+City sites,Investigate duration,458,-0.060,-0.039,0.049,0.665,4
+City sites,Contact,996,-0.014,-0.034,0.049,0.677,5
+City sites,Contact duration,220,-0.132,-0.045,0.053,0.099,6
+City sites,Escape gait,996,-0.122,-0.034,0.048,0.070,7

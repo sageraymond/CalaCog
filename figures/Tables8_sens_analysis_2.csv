@@ -1,0 +1,5 @@
+,Model,N,AIC,Marg. R2,Cond. R2,,AIC,Marg. R2,Cond. R2,X,P
+1,Behavioural diversity,458,117.2,0.748,NA,,111.8,0.763,NA,7.342,0.007
+2,Contact duration,458,117.2,0.748,NA,,NA,0.763,NA,NA,NA
+3,Investigate duration,996,338.4,0.032,NA,,338.7,0.081,NA,1.699,0.192
+4,Escape gait,996,338.4,0.032,NA,,338.7,0.081,NA,1.699,0.192

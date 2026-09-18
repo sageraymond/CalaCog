@@ -1,0 +1,9 @@
+,Model,Term,N,B,P,Low CI,Upp. CI,ES,ES Low CI,ES Upp. CI
+1,Behavioural diversity,Investigate duration,458,0.090,NA,NA,NA,1.095,1.069,1.121
+2,Behavioural diversity,Urbanization (%),458,0.038,NA,NA,NA,1.041,1.021,1.061
+5,Investigate duration,Escape gait,996,1.016,0.077,-0.109,2.141,2.741,0.875,8.592
+6,Investigate duration,Urbanization (%),996,0.018,0.127,-0.005,0.042,1.026,0.999,1.055
+3,Contact duration,Investigate duration,458,2.923,<0.001,2.151,3.694,18.384,8.562,39.473
+4,Contact duration,Urbanization (%),458,0.919,<0.001,0.444,1.394,2.614,1.615,4.231
+7,Escape gait,Escape gait,996,1.016,0.077,-0.109,2.141,2.646,0.843,8.307
+8,Escape gait,Urbanization (%),996,0.440,0.127,-0.125,1.005,1.620,0.713,3.680

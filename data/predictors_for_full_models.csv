@@ -1,0 +1,15 @@
+Response,Extent,terms
+Solves,dat_all,Light + Sex + temp
+Behav_Complexity,dat_all,Light
+Inv,dat_all,Disease + PuzzleType + Year + SiteSequence + Sex
+Inv_duration,dat_all,GroupSize + temp
+Contact,dat_all,Light + Disease + PuzzleType + Year + Sex + temp
+Contact_duration,dat_all,Light + Disease
+Lope,dat_all,Light + SiteSequence + Sex + temp
+Solves,dat_city,Light + temp
+Behav_Complexity,dat_city,Light
+Inv,dat_city,Disease + PuzzleType + Year + SiteSequence + Sex
+Inv_duration,dat_city,GroupSize
+Contact,dat_city,Light + Disease + PuzzleType + Year + Sex + temp
+Lope,dat_city,GroupSize + PuzzleType + SiteSequence + Sex + temp
+Contact_duration,dat_city,1
